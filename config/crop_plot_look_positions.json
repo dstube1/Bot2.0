@@ -1,0 +1,196 @@
+{
+  "crop_plot_look_positions": [
+    {
+      "target_name": "crop_plot_1",
+      "view_direction": [
+        -8.65,
+        16.58
+      ],
+      "crouch": false
+    },
+    {
+      "target_name": "crop_plot_2",
+      "view_direction": [
+        -8.65,
+        4.21
+      ],
+      "crouch": false
+    },
+    {
+      "target_name": "crop_plot_3",
+      "view_direction": [
+        -8.22,
+        -13.12
+      ],
+      "crouch": false
+    },
+    {
+      "target_name": "crop_plot_4",
+      "view_direction": [
+        -7.94,
+        -25.21
+      ],
+      "crouch": false
+    },
+    {
+      "target_name": "crop_plot_5",
+      "view_direction": [
+        -7.18,
+        -17.12
+      ],
+      "crouch": true
+    },
+    {
+      "target_name": "crop_plot_6",
+      "view_direction": [
+        -8.46,
+        -27.36
+      ],
+      "crouch": true
+    },
+    {
+      "target_name": "crop_plot_7",
+      "view_direction": [
+        84.08,
+        -30.44
+      ],
+      "crouch": true
+    },
+    {
+      "target_name": "crop_plot_8",
+      "view_direction": [
+        82.51,
+        -17.5
+      ],
+      "crouch": true
+    },
+    {
+      "target_name": "crop_plot_9",
+      "view_direction": [
+        81.52,
+        -4.14
+      ],
+      "crouch": true
+    },
+    {
+      "target_name": "crop_plot_10",
+      "view_direction": [
+        82.09,
+        -12.54
+      ],
+      "crouch": false
+    },
+    {
+      "target_name": "crop_plot_11",
+      "view_direction": [
+        81.95,
+        -1.45
+      ],
+      "crouch": false
+    },
+    {
+      "target_name": "crop_plot_12",
+      "view_direction": [
+        81.67,
+        16.46
+      ],
+      "crouch": false
+    },
+    {
+      "target_name": "crop_plot_13",
+      "view_direction": [
+        171.15,
+        16.05
+      ],
+      "crouch": false
+    },
+    {
+      "target_name": "crop_plot_14",
+      "view_direction": [
+        171.72,
+        3.4
+      ],
+      "crouch": false
+    },
+    {
+      "target_name": "crop_plot_15",
+      "view_direction": [
+        171.15,
+        -11.07
+      ],
+      "crouch": false
+    },
+    {
+      "target_name": "crop_plot_16",
+      "view_direction": [
+        171.58,
+        -25.85
+      ],
+      "crouch": false
+    },
+    {
+      "target_name": "crop_plot_17",
+      "view_direction": [
+        170.99,
+        -18.06
+      ],
+      "crouch": true
+    },
+    {
+      "target_name": "crop_plot_18",
+      "view_direction": [
+        171.84,
+        -28.02
+      ],
+      "crouch": true
+    },
+    {
+      "target_name": "crop_plot_19",
+      "view_direction": [
+        -97.44,
+        -29.18
+      ],
+      "crouch": true
+    },
+    {
+      "target_name": "crop_plot_20",
+      "view_direction": [
+        -98.59,
+        -18.15
+      ],
+      "crouch": true
+    },
+    {
+      "target_name": "crop_plot_21",
+      "view_direction": [
+        -98.78,
+        -1.84
+      ],
+      "crouch": true
+    },
+    {
+      "target_name": "crop_plot_22",
+      "view_direction": [
+        -98.36,
+        -11.59
+      ],
+      "crouch": false
+    },
+    {
+      "target_name": "crop_plot_23",
+      "view_direction": [
+        -98.5,
+        -0.22
+      ],
+      "crouch": false
+    },
+    {
+      "target_name": "crop_plot_24",
+      "view_direction": [
+        -98.09,
+        15.42
+      ],
+      "crouch": false
+    }
+  ]
+}

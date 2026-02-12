@@ -1,0 +1,14 @@
+{
+	"teleporters": [
+		{
+			"name": "gucci land",
+			"description": "Bed teleporter destination",
+			"enabled": true
+		},
+        {
+            "name": "grinder",
+            "description": "Teleporter to grinder area",
+            "enabled": true
+		}
+	]
+}

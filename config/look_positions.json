@@ -1,0 +1,45 @@
+{
+  "calibrations": [
+    {
+      "name": "tp",
+      "position": -9176.0,
+      "view_direction": [
+        113.95,
+        -80.00
+      ]
+    },
+    {
+      "name": "tp_nudge",
+      "position": -9176.0,
+      "view_direction": [
+        97.70,
+        -69.70
+      ]
+    },
+    {
+      "name": "sleep_pod",
+      "position": -9176.0,
+      "view_direction": [175.91, -42.77]
+    },
+    {
+      "name": "poly_vault",
+      "position": -9176.0,
+      "view_direction": [34.44, 44.99]
+    },
+    {
+      "name": "poly_vault2",
+      "position": -9176.0,
+      "view_direction": [126.95, 49.70]
+    },
+    {
+      "name": "poly_vault3",
+      "position": -9176.0,
+      "view_direction": [-138.99, 46.33]
+    },
+    {
+      "name": "grinder",
+      "position": -9176.0,
+      "view_direction": [105.45, -16.91]
+    }
+  ]
+}

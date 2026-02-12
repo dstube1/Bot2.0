@@ -1,0 +1,13 @@
+{
+  "texts": [
+    { "name": "tp_text", "text": ["Cache", "Item", "Powered", "Small", "Teleport"] },
+    { "name": "tp_inv_text", "text": ["TELEPORTS"] },
+    { "name": "tp_list_text", "text": ["SMALL", "GACHA", "IGUANODON", "VAULT", "GRINDER", "CRYSTAL", "SLEEP", "DUMP", "BERRIES", "SCAN", "BOX"] },
+    { "name": "bag_text", "text": ["Cache", "Item"] },
+    { "name": "inv_text", "text": ["INVENTORY"] },
+    { "name": "take_all_text", "text": ["TRANSFER", "Take All"] },
+    { "name": "store_all_text", "text": ["TRANSFER", "Store All"] },
+    { "name": "drop_all_text", "text": ["DROP", "Drop All"] },
+    { "name": "Pod", "text": ["POD", "SLEEP", "standing"] }
+  ]
+}

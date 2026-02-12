@@ -1,0 +1,95 @@
+{
+  "inventories": [
+    {
+      "name": "tp_textfield",
+      "position": [
+        1001,
+        1284
+      ]
+    },
+    {
+      "name": "choose_top_tp",
+      "position": [
+        792,
+        293
+      ]
+    },
+    {
+      "name": "teleport_button",
+      "position": [
+        2640,
+        1272
+      ]
+    },
+    {
+      "name": "top_screen",
+      "click": [
+        960,
+        10
+      ]
+    },
+    {
+      "name": "take_all",
+      "position": [
+        2365,
+        266
+      ]
+    },
+    {
+      "name": "store_all",
+      "position": [
+        999,
+        271
+      ]
+    },
+    {
+      "name": "drop_all",
+      "position": [
+        1059,
+        265
+      ]
+    },
+    {
+      "name": "textfield_right",
+      "position": [
+        2185,
+        264
+      ]
+    },
+    {
+      "name": "textfield_left",
+      "position": [
+        797,
+        258
+      ]
+    },
+    {
+      "name": "sleep_click",
+      "position": [
+        1900,
+        490
+      ]
+    },
+    {
+      "name": "first_slot_own",
+      "position": [
+        700,
+        370
+      ]
+    },
+    {
+      "name": "nudge_mouse",
+      "position": [
+        12,
+        0
+      ]
+    },
+    {
+      "name": "grind_button",
+      "position": [
+        1700,
+        1100
+      ]
+    }
+  ]
+}

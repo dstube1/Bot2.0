@@ -1,0 +1,13 @@
+Task: restart at box 5 stage 'gacha2_gettraps': Restart signal for: teleport:plots2
+[13:13:03] [WARN] FeedAllGachasMajorTask restart signaled: Restart signal for: teleport:plots2; will retry (attempt 2/5).
+[13:13:03] [INFO] --- FeedAllGachasMajorTask Attempt 3/5 ---
+[13:13:03] [INFO] Feeding Gacha 1, Box 5/5
+[13:13:03] [INFO] Feeding Gacha 2, Box 5/5
+[13:13:03] [INFO] open_inv: inventory already open (structure:unknown); skipping 'f'.
+[13:13:27] [WARN] FeedAllGachasMajorTask: restart at box 5 stage 'gacha2_gettraps': Restart signal for: teleport:plots2
+[13:13:27] [WARN] FeedAllGachasMajorTask restart signaled: Restart signal for: teleport:plots2; will retry (attempt 3/5).
+[13:13:27] [INFO] --- FeedAllGachasMajorTask Attempt 4/5 ---
+[13:13:27] [INFO] Feeding Gacha 1, Box 5/5
+[13:13:27] [INFO] Feeding Gacha 2, Box 5/5
+[13:13:28] [INFO] open_inv: inventory already open (structure:unknown); skipping 'f'.
+F1 pressed: immediate cancellation.

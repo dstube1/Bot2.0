@@ -1,0 +1,49 @@
+{
+  "gachas": [
+    { "name": "gacha_1", "window": [10, 20, 110, 120] },
+    { "name": "gacha_2", "window": [15, 25, 115, 125] },
+    { "name": "gacha_3", "window": [10, 20, 110, 120] },
+    { "name": "gacha_4", "window": [15, 25, 115, 125] }
+  ],
+  "crop_plots": [
+    { "name": "crop_plot_1",  "window": [1200, 520, 2200, 1300] },
+    { "name": "crop_plot_2",  "window": [1200, 520, 2200, 1300] },
+    { "name": "crop_plot_3",  "window": [1200, 520, 2200, 1300] },
+    { "name": "crop_plot_4",  "window": [1200, 520, 2200, 1300] },
+    { "name": "crop_plot_5",  "window": [1200, 520, 2200, 1300] },
+    { "name": "crop_plot_6",  "window": [1200, 520, 2200, 1300] },
+    { "name": "crop_plot_7",  "window": [1200, 520, 2200, 1300] },
+    { "name": "crop_plot_8",  "window": [1200, 520, 2200, 1300] },
+    { "name": "crop_plot_9",  "window": [1200, 520, 2200, 1300] },
+    { "name": "crop_plot_10", "window": [1200, 520, 2200, 1300] },
+    { "name": "crop_plot_11", "window": [1200, 520, 2200, 1300] },
+    { "name": "crop_plot_12", "window": [1200, 520, 2200, 1300] },
+    { "name": "crop_plot_13", "window": [1200, 520, 2200, 1300] },
+    { "name": "crop_plot_14", "window": [1200, 520, 2200, 1300] },
+    { "name": "crop_plot_15", "window": [1200, 520, 2200, 1300] },
+    { "name": "crop_plot_16", "window": [1200, 520, 2200, 1300] },
+    { "name": "crop_plot_17", "window": [1200, 520, 2200, 1300] },
+    { "name": "crop_plot_18", "window": [1200, 520, 2200, 1300] },
+    { "name": "crop_plot_19", "window": [1200, 520, 2200, 1300] },
+    { "name": "crop_plot_20", "window": [1200, 520, 2200, 1300] },
+    { "name": "crop_plot_21", "window": [1200, 520, 2200, 1300] },
+    { "name": "crop_plot_22", "window": [1200, 520, 2200, 1300] },
+    { "name": "crop_plot_23", "window": [1200, 520, 2200, 1300] },
+    { "name": "crop_plot_24", "window": [1200, 520, 2200, 1300] }
+  ],
+  "other": [
+    { "name": "teleporter", "window": [1460,700,2000,1180] },
+    { "name": "tp_inv", "window": [710,160,1050,250] },
+    { "name": "tp_list", "window": [550,250,1180,630] },
+    { "name": "inventory", "window": [660, 150, 880, 220] },
+    { "name": "take_all", "window": [2360,220,2560,340] },
+    { "name": "store_all", "window": [1000,230,1180,355] },
+    { "name": "drop_all", "window": [1080,230,1195,330] },
+    { "name": "Pod", "window": [1400, 680, 1950, 1150] },
+    { "name": "first_slot_own", "window": [675, 315, 795, 435] },
+    { "name": "first_slot_grinder", "window": [2290, 310, 2410, 435] },
+    { "name": "grinder_slots", "window": [1850, 700, 1965, 730] },
+    { "name": "player_weight", "window": [3340, 1000, 3430, 1070] },
+    { "name": "dedi_amt", "window": [1500, 350, 1950, 450] }
+  ]
+}

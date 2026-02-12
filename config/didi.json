@@ -1,0 +1,139 @@
+{
+  "dedis": [
+    {
+      "resource": "wood",
+      "teleporter": "grinder",
+      "view_direction": { "yaw": 150.76, "pitch": 15.51 },
+      "is_gacha_crystal_ressource": false,
+      "is_dedi": true,
+      "crouch": false
+    },
+    {
+      "resource": "metal",
+      "teleporter": "grinder",
+      "view_direction": { "yaw": 151.62, "pitch": -14.21 },
+      "is_gacha_crystal_ressource": false,
+      "is_dedi": true,
+      "crouch": false
+    },
+    {
+      "resource": "stone",
+      "teleporter": "grinder",
+      "view_direction": { "yaw": 151.69, "pitch": -21.73 },
+      "is_gacha_crystal_ressource": false,
+      "is_dedi": true,
+      "crouch": true
+    },
+    {
+      "resource": "fiber",
+      "teleporter": "grinder",
+      "view_direction": { "yaw": -167.14, "pitch": -20.94 },
+      "is_gacha_crystal_ressource": false,
+      "is_dedi": true,
+      "crouch": true
+    },
+    {
+      "resource": "thatch",
+      "teleporter": "grinder",
+      "view_direction": { "yaw": -167.47, "pitch": -15.76 },
+      "is_gacha_crystal_ressource": false,
+      "is_dedi": true,
+      "crouch": false
+    },
+    {
+      "resource": "paste",
+      "teleporter": "grinder",
+      "view_direction": { "yaw": -168.02, "pitch": 12.43 },
+      "is_gacha_crystal_ressource": false,
+      "is_dedi": true,
+      "crouch": false
+    },
+    {
+      "resource": "flint",
+      "teleporter": "grinder",
+      "view_direction": { "yaw": -120.37, "pitch": 12.67 },
+      "is_gacha_crystal_ressource": false,
+      "is_dedi": true,
+      "crouch": false
+    },
+    {
+      "resource": "chitin",
+      "teleporter": "grinder",
+      "view_direction": { "yaw": -118.82, "pitch": -15.51 },
+      "is_gacha_crystal_ressource": false,
+      "is_dedi": true,
+      "crouch": false
+    },
+    {
+      "resource": "hide",
+      "teleporter": "grinder",
+      "view_direction": { "yaw": -121.82, "pitch": -8.39 },
+      "is_gacha_crystal_ressource": false,
+      "is_dedi": true,
+      "crouch": true
+    },
+    {
+      "resource": "silica",
+      "teleporter": "grinder",
+      "view_direction": { "yaw": -76.70, "pitch": -9.60 },
+      "is_gacha_crystal_ressource": false,
+      "is_dedi": true,
+      "crouch": true
+    },{
+      "resource": "electronics",
+      "teleporter": "grinder",
+      "view_direction": { "yaw": -77.27, "pitch": -16.88 },
+      "is_gacha_crystal_ressource": false,
+      "is_dedi": true,
+      "crouch": false
+    },
+    {
+      "resource": "crystal",
+      "teleporter": "grinder",
+      "view_direction": { "yaw": -79.11, "pitch": 13.55 },
+      "is_gacha_crystal_ressource": false,
+      "is_dedi": true,
+      "crouch": false
+    },
+    {
+      "resource": "anglergel",
+      "teleporter": "grinder",
+      "view_direction": { "yaw": -20.81, "pitch": 18.00 },
+      "is_gacha_crystal_ressource": false,
+      "is_dedi": true,
+      "crouch": false
+    },
+    {
+      "resource": "dust1",
+      "teleporter": "grinder",
+      "view_direction": { "yaw": 13.99, "pitch": 13.31 },
+      "is_gacha_crystal_ressource": true,
+      "is_dedi": true,
+      "crouch": false
+    },
+    {
+      "resource": "dust2",
+      "teleporter": "grinder",
+      "view_direction": { "yaw": 14.93, "pitch": -14.72 },
+      "is_gacha_crystal_ressource": true,
+      "is_dedi": true,
+      "crouch": false
+    },
+    {
+      "resource": "dust3",
+      "teleporter": "grinder",
+      "view_direction": { "yaw": 14.05, "pitch": -24.49 },
+      "is_gacha_crystal_ressource": true,
+      "is_dedi": true,
+      "crouch": true
+    },
+    {
+      "resource": "Rest",
+      "teleporter": "grinder",
+      "view_direction": { "yaw": -53.23, "pitch": 45.30 },
+      "is_gacha_crystal_ressource": false,
+      "is_dedi": false,
+      "crouch": false
+    }
+  ]
+}
