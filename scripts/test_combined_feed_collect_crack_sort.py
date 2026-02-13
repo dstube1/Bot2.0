@@ -156,7 +156,7 @@ def main():
         return
 
     total_cycles = 20
-    feeds_per_cycle = 3
+    feeds_per_cycle = 2
     for cycle in range(total_cycles):
         info(f"=== Procedure Cycle {cycle+1}/{total_cycles} ===")
         # Feed All 3 times per cycle
@@ -185,12 +185,12 @@ def main():
         finally:
             inv.close_inv()
         # Optional: go to bed between phases to settle state (requires bot_state)
-        try:
-            player_input.go_to_bed(bot_state)
-            time.sleep(20)
-            player_input.wake_up(bot_state, settle_seconds=0.7)
-        except Exception:
-            pass
+        #try:
+        #    player_input.go_to_bed(bot_state)
+        #    time.sleep(20)
+        #    player_input.wake_up(bot_state, settle_seconds=0.7)
+        #except Exception:
+        #    pass
 
         info(f"Starting CollectAndCrackAllGachasTask for {len(gacha_boxes)} boxes...")
 

@@ -587,6 +587,8 @@ class PlayerInput:
         Args:
             destination (str): The name of the destination Teleporter.
         """
+        # Calibrate view before looking at tp
+        self.calibrate_current_view(bot_pos)
         # Face teleporter UI region
         self.look_at(self.tp, bot_pos)
         # Checking if seeing teleporter using preloaded scan regions and expected texts
@@ -641,13 +643,14 @@ class PlayerInput:
 
             # Hold 'e', click sleep, then release 'e' as requested
             pyautogui.keyDown('e')
-            time.sleep(0.2)
+            time.sleep(1)
             if self.sleep_click and isinstance(self.sleep_click, tuple):
                 self.move_mouse_absolute(*self.sleep_click)
+                time.sleep(1)
                 pyautogui.click()
             else:
                 warn("go_to_bed: sleep_click position missing; skipping click.")
-            time.sleep(0.3)
+            time.sleep(1)
             pyautogui.keyUp('e')
             time.sleep(0.7)
 

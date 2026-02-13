@@ -3,56 +3,152 @@
     {
       "name": "box_1",
       "tp_box": "box1",
-      "tp_plots_gacha1": "plots1",
-      "tp_plots_gacha2": "plots2",
-      "pego_view_direction": { "yaw": -110.62, "pitch": -37.19 },
-      "gacha1_view_direction": { "yaw": 104.78, "pitch": 11.88 },
-      "gacha2_view_direction": { "yaw": 30.66, "pitch": 20.32 }
+      "pego_view_direction": {
+        "yaw": -131.56,
+        "pitch": -29.96,
+        "x": -120384.0,
+        "y": 172066.0,
+        "z": -6734.0
+      },
+      "gacha1_view_direction": {
+        "yaw": 125.9,
+        "pitch": 25.65,
+        "x": -120384.0,
+        "y": 172066.0,
+        "z": -6734.0
+      },
+      "gacha2_view_direction": {
+        "yaw": 40.73,
+        "pitch": 17.8,
+        "x": -120384.0,
+        "y": 172066.0,
+        "z": -6734.0
+      }
     },
     {
       "name": "box_2",
       "tp_box": "box2",
-      "tp_plots_gacha1": "plots1",
-      "tp_plots_gacha2": "plots2",
-      "pego_view_direction": { "yaw": -83.78, "pitch": -36.91 },
-      "gacha1_view_direction": { "yaw": 123.36, "pitch": 18.02 },
-      "gacha2_view_direction": { "yaw": 40.78, "pitch": 17.12 }
+      "pego_view_direction": {
+        "yaw": -86.14,
+        "pitch": -36.37,
+        "x": -113789.0,
+        "y": 171162.0,
+        "z": -6734.0
+      },
+      "gacha1_view_direction": {
+        "yaw": 120.31,
+        "pitch": 21.9,
+        "x": -113789.0,
+        "y": 171162.0,
+        "z": -6734.0
+      },
+      "gacha2_view_direction": {
+        "yaw": 44.82,
+        "pitch": 21.66,
+        "x": -113789.0,
+        "y": 171162.0,
+        "z": -6734.0
+      }
     },
     {
       "name": "box_3",
       "tp_box": "box3",
-      "tp_plots_gacha1": "plots1",
-      "tp_plots_gacha2": "plots2",
-      "pego_view_direction": { "yaw": -155.96, "pitch": -34.23 },
-      "gacha1_view_direction": { "yaw": 32.11, "pitch": 22.44 },
-      "gacha2_view_direction": { "yaw": -59.81, "pitch": 16.33 }
+      "pego_view_direction": {
+        "yaw": 171.7,
+        "pitch": -35.41,
+        "x": -114235.0,
+        "y": 167967.0,
+        "z": -6734.0
+      },
+      "gacha1_view_direction": {
+        "yaw": 34.45,
+        "pitch": 25.03,
+        "x": -114235.0,
+        "y": 167967.0,
+        "z": -6734.0
+      },
+      "gacha2_view_direction": {
+        "yaw": -56.91,
+        "pitch": 22.4,
+        "x": -114235.0,
+        "y": 167967.0,
+        "z": -6734.0
+      }
     },
     {
       "name": "box_4",
       "tp_box": "box4",
-      "tp_plots_gacha1": "plots1",
-      "tp_plots_gacha2": "plots2",
-      "pego_view_direction": { "yaw": -158.62, "pitch": -33.74 },
-      "gacha1_view_direction": { "yaw": 10.96, "pitch": 20.12 },
-      "gacha2_view_direction": { "yaw": -47.74, "pitch": 15.44 }
+      "pego_view_direction": {
+        "yaw": 160.31,
+        "pitch": -36.57,
+        "x": -114680.0,
+        "y": 164683.0,
+        "z": -6734.0
+      },
+      "gacha1_view_direction": {
+        "yaw": 36.48,
+        "pitch": 23.05,
+        "x": -114680.0,
+        "y": 164683.0,
+        "z": -6734.0
+      },
+      "gacha2_view_direction": {
+        "yaw": -53.46,
+        "pitch": 18.43,
+        "x": -114680.0,
+        "y": 164683.0,
+        "z": -6734.0
+      }
     },
     {
       "name": "box_5",
       "tp_box": "box5",
-      "tp_plots_gacha1": "plots1",
-      "tp_plots_gacha2": "plots2",
-      "pego_view_direction": { "yaw": 93.76, "pitch": -32.54 },
-      "gacha1_view_direction": { "yaw": -51.81, "pitch": 18.30 },
-      "gacha2_view_direction": { "yaw": -133.68, "pitch": 24.45 }
+      "pego_view_direction": {
+        "yaw": 88.09,
+        "pitch": -30.7,
+        "x": -115082.0,
+        "y": 161374.0,
+        "z": -6734.0
+      },
+      "gacha1_view_direction": {
+        "yaw": -51.69,
+        "pitch": 27.03,
+        "x": -115082.0,
+        "y": 161374.0,
+        "z": -6734.0
+      },
+      "gacha2_view_direction": {
+        "yaw": -144.09,
+        "pitch": 22.39,
+        "x": -115082.0,
+        "y": 161374.0,
+        "z": -6734.0
+      }
     },
     {
       "name": "box_6",
       "tp_box": "box6",
-      "tp_plots_gacha1": "plots1",
-      "tp_plots_gacha2": "plots2",
-      "pego_view_direction": { "yaw": 81.05, "pitch": -32.00 },
-      "gacha1_view_direction": { "yaw": -62.02, "pitch": 15.82 },
-      "gacha2_view_direction": { "yaw": -139.93, "pitch": 12.69 }
+      "pego_view_direction": {
+        "yaw": 73.92,
+        "pitch": -35.85,
+        "x": -121627.0,
+        "y": 162271.0,
+        "z": -6734.0
+      },
+      "gacha1_view_direction": {
+        "yaw": -55.55,
+        "pitch": 23.71,
+        "x": -121627.0,
+        "y": 162271.0,
+        "z": -6734.0
+      },
+      "gacha2_view_direction": {
+        "yaw": -138.8,
+        "pitch": 20.63,
+        "x": -121627.0,
+        "y": 162271.0,
+        "z": -6734.0
+      }
     }
   ]
 }
