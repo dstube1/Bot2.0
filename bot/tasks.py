@@ -91,6 +91,7 @@ class GetTrapsTask(BaseTask):
         for i in self.indices:
             plot = self.crop_plots[i]
             debug(f"Collecting trap from plot {i} with view {plot.get('view_direction')}")
+         
             # Align crouch state with plot requirement
             required_crouch = bool(plot.get('crouch', False))
             if required_crouch != bool(self.bot_state.is_crouching):
@@ -585,28 +586,29 @@ class SortLootAndGrindTask(BaseTask):
                 warn(f"Failed to save accumulated grind stats: {e}")
 
     def store_metal(self):
-        """Store only metal to its dedicated storage(s) defined in didi.json.
+        """Store metal, wood, and stone to their dedicated storage(s) defined in didi.json.
 
-        Expects dedis entries with resource == 'metal' and optional view_direction.
+        Expects dedis entries with resource == 'metal', 'wood', or 'stone' and optional view_direction.
         """
         data = self.player_input.load_json("didi.json")
         dedis = data.get("dedis", [])
         for d in dedis:
             try:
-                if (d.get("resource") or '').lower() != 'metal':
+                resource = (d.get("resource") or '').lower()
+                if resource not in ('metal', 'wood', 'stone'):
                     continue
                 view = d.get("view_direction")
                 if view is not None:
                     self.player_input.look_at(view, self.bot_state)
                 time.sleep(0.1)
-                self.inventory_manager.open_inv('metal')
+                self.inventory_manager.open_inv(resource)
                 self.inventory_manager.store_all()
                 self.inventory_manager.close_inv()
             except Exception as e:
-                warn(f"store_metal: error at metal dedi '{d.get('name') or d.get('resource')}': {e}")
+                warn(f"store_metal: error at {resource} dedi '{d.get('name') or d.get('resource')}': {e}")
 
     def grind_inventory_metal_first(self):
-        """After grinding: repeatedly take grinder contents and store only metal until first slot empty."""
+        """After grinding: repeatedly take grinder contents and store only metal, wood and stone until first slot empty."""
         info("Metal-first presorting loop starting...")
         # Align and pull initial batch
         self.player_input.look_at(self.grinder_view_direction, self.bot_state)
@@ -832,6 +834,8 @@ class FeedAllGachasMajorTask(BaseTask):
         for idx, box in enumerate(sets):
             if idx < start_idx:
                 continue
+            # Always reset last_action_success at the start of each box
+            self.bot_state.last_action_success = True
             # Cycle through 4 sets of plots: plots1, plots2, plots3, plots4
             plots_cycle = ["plots1", "plots2", "plots3", "plots4"]
             tp_plots = plots_cycle[idx % 4]
@@ -849,24 +853,23 @@ class FeedAllGachasMajorTask(BaseTask):
                     # Keep checkpoint and abort major run to resume next time
                     raise
 
-            info(f"Feeding Box {idx+1}/{len(sets)} using {'plots1' if idx % 2 == 0 else 'plots2'}")
+            info(f"Feeding Box {idx+1}/{len(sets)} using {tp_plots}")
             # 1. Get traps from selected plots
             if start_stage is None or start_stage == stages[0]:
                 run_stage('gettraps', lambda: (
                     self.player_input.teleport_to(tp_plots, self.bot_state) if tp_plots else None,
                     GetTrapsTask(self.bot_state, self.player_input, self.inventory_manager, crop_plots=plots, indices=range(0, 24)).run()
                 ))
+            # Always run FeedGachaTask after GetTrapsTask, unless a RestartTask was raised
             # 2. Teleport to box and feed Gacha 1
-            if start_stage is None or start_stage == stages[1]:
-                run_stage('feed_gacha1', lambda: (
-                    self.player_input.teleport_to(tp_box, self.bot_state) if tp_box else None,
-                    FeedGachaTask(self.bot_state, self.player_input, self.inventory_manager, tp_box, g1_view).run() if (tp_box and g1_view) else None
-                ))
+            run_stage('feed_gacha1', lambda: (
+                self.player_input.teleport_to(tp_box, self.bot_state) if tp_box else None,
+                FeedGachaTask(self.bot_state, self.player_input, self.inventory_manager, tp_box, g1_view).run() if (tp_box and g1_view) else None
+            ))
             # 3. Feed Gacha 2 (already at box)
-            if start_stage is None or start_stage == stages[2]:
-                run_stage('feed_gacha2', lambda: (
-                    FeedGachaTask(self.bot_state, self.player_input, self.inventory_manager, tp_box, g2_view).run() if (tp_box and g2_view) else None
-                ))
+            run_stage('feed_gacha2', lambda: (
+                FeedGachaTask(self.bot_state, self.player_input, self.inventory_manager, tp_box, g2_view).run() if (tp_box and g2_view) else None
+            ))
 
             # Completed box; advance checkpoint
             self.bot_state.major_checkpoint_idx = idx + 1

@@ -1133,7 +1133,7 @@ class OCR:
         
 
 class Recovery:
-    """Handles recovery procedures if something goes wrong."""
+                  
     def __init__(self, player_input: Optional[PlayerInput] = None):
         self.player_input = player_input
         self.ocr = player_input.ocr if player_input else OCR()
@@ -1152,6 +1152,129 @@ class Recovery:
         return False
 
     def reset_player(self, bot_state: Optional[BotState] = None) -> bool:
+        """Minimal recovery: close inventory if open, calibrate view, and resume task."""
+        pi = self.player_input
+        if not pi:
+            warn("Recovery: player_input not set; cannot perform UI checks. Assuming success.")
+            return True
+
+        # Only close inventory if open
+        own_inv_open = self._text_present(pi.own_inv_scan, pi.inv_text)
+        tp_inv_open  = self._text_present(pi.tp_inv_scan, pi.tp_inv_text)
+        if own_inv_open or tp_inv_open:
+            debug("Recovery: Inventory detected open; pressing ESC to close.")
+            pyautogui.press('esc')
+            time.sleep(0.2)
+            # Optionally recheck and press again if still open
+            own_inv_open = self._text_present(pi.own_inv_scan, pi.inv_text)
+            tp_inv_open  = self._text_present(pi.tp_inv_scan, pi.tp_inv_text)
+            if own_inv_open or tp_inv_open:
+                debug("Recovery: Inventory still open after ESC; pressing ESC again.")
+                pyautogui.press('esc')
+                time.sleep(0.2)
+
+        # Calibrate view
+        try:
+            self.player_input.calibrate_current_view(bot_state)
+        except Exception as e:
+            warn(f"Recovery: calibrate_current_view failed: {e}")
+        return True
+
+    def proceed_post_reset(self, bot_state: BotState) -> bool:
+        """No-op: post-reset flow is now minimal."""
+        return True
+
+    def acquire_teleporter(self, bot_state: BotState, attempts: int = 8, horiz_step: int = 120) -> bool:
+        """Attempt to make teleporter text visible.
+
+        Strategy:
+        1. Check current view.
+        2. Direct look_at(tp) if calibration exists.
+        3. Perform left/right horizontal sweeps updating approximate yaw until teleporter text appears.
+           Yaw adjustment is heuristic based on degree_to_pixel_factor.
+
+        Returns True if teleporter text detected, else False.
+        """
+        if not self.player_input:
+            return False
+        pi = self.player_input
+        # Helper to test presence
+        def visible():
+            return self._text_present(pi.tp_scan, pi.tp_text)
+        # Immediate check
+        if visible():
+            return True
+        # Direct look using calibration
+        if pi.tp:
+            debug("acquire_teleporter: direct look_at(tp) attempt")
+            pi.look_at(pi.tp, bot_state)
+            time.sleep(0.15)
+            if visible():
+                return True
+        # Optional nudge calibration attempt
+        if getattr(pi, 'tp_nudge', None):
+            debug("acquire_teleporter: using tp_nudge calibration once")
+            pi.look_at(pi.tp_nudge, bot_state)
+            time.sleep(0.15)
+            if visible():
+                return True
+            # Return to tp again
+            if pi.tp:
+                pi.look_at(pi.tp, bot_state)
+                time.sleep(0.15)
+                if visible():
+                    return True
+        # Horizontal sweep search
+        debug("acquire_teleporter: starting horizontal sweep search")
+        direction = 1
+        for i in range(attempts):
+            pi.move_mouse_relative(horiz_step * direction, 0)
+            # Heuristic update of yaw in bot_state
+            if bot_state.view_direction:
+                yaw, pitch = bot_state.view_direction
+                # inverse of conversion in look_at: pixels * (degrees per pixel) where degrees per pixel ~= factor_x?
+                # look_at used dx_pix = int(dx_deg / factor_x) => dx_deg ≈ dx_pix * factor_x
+                yaw += (horiz_step * direction) / pi.degree_to_pixel_factor_x
+                bot_state.view_direction = (yaw, pitch)
+            time.sleep(0.12)
+            if visible():
+                debug(f"acquire_teleporter: teleporter detected during sweep (step {i}, dir {direction}).")
+                return True
+            # Alternate direction to fan outward
+            direction *= -1
+        warn("acquire_teleporter: teleporter not found after sweeps")
+        return False
+
+    
+    def option1(self, bot_state: BotState) -> bool:
+        """No-op: option1 is now unused."""
+        return True
+
+    def option2(self, bot_state: BotState) -> bool:
+        """No-op: option2 is now unused."""
+        return True
+
+
+class RecoveryOld:
+                  
+    def __init__(self, player_input: Optional[PlayerInput] = None):
+        self.player_input = player_input
+        self.ocr = player_input.ocr if player_input else OCR()
+
+    def _text_present_old(self, region: Optional[Tuple[int,int,int,int]], expected_texts: Optional[List[str]]) -> bool:
+        if not region or not expected_texts:
+            return False
+        try:
+            text = self.ocr.recognize_text(region)
+            cleaned = text.replace(' ', '').replace('\n', '').replace('\r', '').upper()
+            for t in expected_texts:
+                if t.upper() in cleaned:
+                    return True
+        except Exception:
+            pass
+        return False
+
+    def reset_player_old(self, bot_state: Optional[BotState] = None) -> bool:
         """Ensure no inventory UI is open; press ESC if needed, then recheck.
 
         Logic:
@@ -1217,7 +1340,7 @@ class Recovery:
             pass
         return False
 
-    def proceed_post_reset(self, bot_state: BotState) -> bool:
+    def proceed_post_reset_old(self, bot_state: BotState) -> bool:
         """After reset, calibrate view, look at teleporter, and branch based on visibility."""
         if not self.player_input:
             return True
@@ -1244,12 +1367,12 @@ class Recovery:
         # Try to acquire teleporter visibility (direct + scanning if needed)
         if self.acquire_teleporter(bot_state):
             debug("Recovery: Teleporter acquired; proceeding with option1.")
-            return self.option1(bot_state)
+            return #self.option1(bot_state)
         else:
             debug("Recovery: Teleporter still not visible after scan; proceeding with option2.")
             return self.option2(bot_state)
 
-    def acquire_teleporter(self, bot_state: BotState, attempts: int = 8, horiz_step: int = 120) -> bool:
+    def acquire_teleporter_old(self, bot_state: BotState, attempts: int = 8, horiz_step: int = 120) -> bool:
         """Attempt to make teleporter text visible.
 
         Strategy:
@@ -1310,7 +1433,8 @@ class Recovery:
         warn("acquire_teleporter: teleporter not found after sweeps")
         return False
 
-    def option1(self, bot_state: BotState) -> bool:
+    
+    def option1_old(self, bot_state: BotState) -> bool:
         """Teleporter visible: go to bed, wake up, return to last teleporter, and proceed."""
         if not self.player_input:
             return False
@@ -1337,10 +1461,9 @@ class Recovery:
             debug("Recovery option1: no last destination recorded; skipping teleport back.")
         return True
 
-    def option2(self, bot_state: BotState) -> bool:
+    def option2_old(self, bot_state: BotState) -> bool:
         """Placeholder for post-reset branch when teleporter is not visible."""
         return True
-
 class TaskExecutor:
     """Executes ordered tasks and verifies completion."""
     def execute_task(self, task):
