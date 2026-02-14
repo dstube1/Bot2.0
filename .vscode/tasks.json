@@ -1,0 +1,15 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Run calibrate_boxes.py",
+			"type": "shell",
+			"command": "python",
+			"args": [
+				"utils/calibrate_boxes.py"
+			],
+			"problemMatcher": [],
+			"group": "build"
+		}
+	]
+}

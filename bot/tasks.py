@@ -195,7 +195,7 @@ class CrackCrystalsTask(BaseTask):
         for i in range(self.count):
             debug(f"Cracking crystals at grinder iteration {i+1}/{self.count}")
             self.crack_crystals()
-            time.sleep(0.5)
+            time.sleep(1)
             self.sort_ressources()
 
     def crack_crystals(self):
@@ -274,7 +274,7 @@ class CrackCrystalsTask(BaseTask):
                 #    self.player_input.teleport_to(tp, self.bot_state)
                 if view is not None:
                     self.player_input.look_at(view, self.bot_state)
-                time.sleep(0.1)
+                time.sleep(0.2)
                 # Open storage inventory in front
                 self.inventory_manager.open_inv()
                 self.inventory_manager.store_all()
@@ -484,7 +484,7 @@ class SortLootAndGrindTask(BaseTask):
         # Load dedis configuration
         data = self.player_input.load_json("didi.json")
         dedis = data.get("dedis", [])
-
+        time.sleep(0.5)
         grinder_statistics = {}
         # Accumulate per-dedi stats to save once after loop
         stats_dir = os.path.join(os.path.dirname(__file__), "..", "logs")
@@ -506,10 +506,15 @@ class SortLootAndGrindTask(BaseTask):
         per_dedi_amounts = {res: 0 for res in resource_names}
 
         # Iterate over configured grinder resource storages
-        for d in dedis:
+        for i, d in enumerate(dedis):
             try:
+                
                 view = d.get("view_direction")
                 name = d.get("resource") 
+                # Every 3 dedis, calibrate view
+                if i > 0 and i % 3 == 0:
+                    info(f"Calibrating view after {i} dedis...")
+                    self.player_input.get_calibration_view_direction(name)
                 # Optional: crouch requirement per storage when distributing grinder outputs
                 required_crouch = bool(d.get("crouch", False))
                 if required_crouch != bool(self.bot_state.is_crouching):
@@ -621,13 +626,14 @@ class SortLootAndGrindTask(BaseTask):
             if empty:
                 info("Grinder first slot empty – presort complete.")
                 self.inventory_manager.close_inv()
-                time.sleep(0.7)
+                time.sleep(1)
                 break
             tries += 1
             info(f"Grinder still has items; storing metal chunk... (try {tries}/{max_tries})")
             # Close grinder, store metal, then re-open and take next batch
             self.inventory_manager.close_inv()
-            time.sleep(0.2)
+            time.sleep(1)
+            self.player_input.get_calibration_view_direction('grinder')
             self.store_metal()
             # Failsafe: after max_tries, run resource sorting once to relieve pressure
             if tries == max_tries:

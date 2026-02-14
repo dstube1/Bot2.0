@@ -26,7 +26,12 @@ def calibrate_boxes():
     player_input = PlayerInput()
     time.sleep(4)  # Give user time to switch to Game
 
-    for idx, box in enumerate(sets):
+    # Only calibrate boxes 7 to 12 (indices 6 to 11)
+    for idx in range(6, 12):
+        if idx >= len(sets):
+            print(f"Box index {idx+1} does not exist in gacha_sets.json.")
+            continue
+        box = sets[idx]
         box_name = box.get("name", f"box_{idx+1}")
         tp_box = box.get("tp_box")
         print(f"\nTeleporting to {box_name} ({tp_box})...")

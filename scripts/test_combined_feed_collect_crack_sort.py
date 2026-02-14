@@ -156,7 +156,7 @@ def main():
         return
 
     total_cycles = 20
-    feeds_per_cycle = 1
+    feeds_per_cycle = 0
     for cycle in range(total_cycles):
         info(f"=== Procedure Cycle {cycle+1}/{total_cycles} ===")
         # Feed All 3 times per cycle
