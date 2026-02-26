@@ -384,17 +384,20 @@ class SortLootAndGrindTask(BaseTask):
                 if self.is_vault_full():
                     self.do_vault_full_task()
         self.inventory_manager.close_inv()
+        time.sleep(0.5)
 
     def grind_junk(self):
         """Deposit remaining items to grinder for processing (base routine)."""
         # Ensure we are facing and opening the grinder explicitly
         self.player_input.look_at(self.grinder_view_direction, self.bot_state)
+        time.sleep(0.2)
         debug("Opening grinder inventory for junk deposit...")
         self.inventory_manager.open_inv('grinder')
         try:
             self.inventory_manager.store_all()
             # After depositing, check slot count and trigger grind if over threshold
             try:
+                time.sleep(0.5)  # wait for inventory to update after storing
                 # Use configured grinder slot scan region
                 region = getattr(self.player_input, 'grinder_slots', None)
                 full = self.inventory_manager.grinder_slots(region, 80)
@@ -454,7 +457,7 @@ class SortLootAndGrindTask(BaseTask):
         Replace with actual UI coordinates and input actions. Uses
         `config/click_positions.json` key `grind_button` if present.
         """
-        info("Clicking Grind button")
+        debug("Clicking Grind button")
         try:
             pos = getattr(self.player_input, "grind_button", None)
             if pos is not None:
@@ -474,7 +477,7 @@ class SortLootAndGrindTask(BaseTask):
         - open inventory, store all
         """
         info("Sorting grinder resources...")
-        time.sleep(0.2)
+        time.sleep(0.4)
         # First, pull resources from grinder -> player
         self.player_input.look_at(self.grinder_view_direction, self.bot_state)
         self.inventory_manager.open_inv("grinder")
@@ -513,8 +516,8 @@ class SortLootAndGrindTask(BaseTask):
                 name = d.get("resource") 
                 # Every 3 dedis, calibrate view
                 if i > 0 and i % 3 == 0:
-                    info(f"Calibrating view after {i} dedis...")
-                    self.player_input.get_calibration_view_direction(name)
+                    debug(f"Calibrating view after {i} dedis...")
+                    self.player_input.calibrate_current_view(bot_state=self.bot_state)
                 # Optional: crouch requirement per storage when distributing grinder outputs
                 required_crouch = bool(d.get("crouch", False))
                 if required_crouch != bool(self.bot_state.is_crouching):
@@ -530,11 +533,12 @@ class SortLootAndGrindTask(BaseTask):
                     amt, _res_ignored = self.player_input.ocr.read_dedi_amount(region)
                     if amt is not None:
                         res_name = (name or '').upper() if isinstance(name, str) else ''
-                        info(f"Dedi '{res_name}': CONTAINS {amt}")
+                        debug(f"Dedi '{res_name}': CONTAINS {amt}")
                         if res_name:
                             per_dedi_amounts[res_name] = amt
                 self.inventory_manager.store_all()
                 self.inventory_manager.close_inv()
+                time.sleep(0.2)
             except Exception as e:
                 warn(f"sort_resources_from_grinding: error at '{d.get('name') or d.get('resource')}': {e}")
         # Ensure we leave crouch state off at the end to not affect subsequent tasks
@@ -576,7 +580,7 @@ class SortLootAndGrindTask(BaseTask):
                     row = [ts_now] + [per_dedi_amounts.get(res, 0) for res in resource_names]
                     ws.append(row)
                     wb.save(xlsx_path)
-                    info(f"Saved grind stats to Excel: {xlsx_path}")
+                    debug(f"Saved grind stats to Excel: {xlsx_path}")
                 except Exception as e:
                     # Fallback to CSV
                     csv_path = os.path.join(stats_dir, "grind_stats.csv")
@@ -600,7 +604,7 @@ class SortLootAndGrindTask(BaseTask):
         for d in dedis:
             try:
                 resource = (d.get("resource") or '').lower()
-                if resource not in ('metal', 'wood', 'stone'):
+                if resource not in ('metal', 'wood'):
                     continue
                 view = d.get("view_direction")
                 if view is not None:
@@ -609,12 +613,14 @@ class SortLootAndGrindTask(BaseTask):
                 self.inventory_manager.open_inv(resource)
                 self.inventory_manager.store_all()
                 self.inventory_manager.close_inv()
+                time.sleep(1)
             except Exception as e:
                 warn(f"store_metal: error at {resource} dedi '{d.get('name') or d.get('resource')}': {e}")
+        time.sleep(1)
 
     def grind_inventory_metal_first(self):
         """After grinding: repeatedly take grinder contents and store only metal, wood and stone until first slot empty."""
-        info("Metal-first presorting loop starting...")
+        debug("Metal-first presorting loop starting...")
         # Align and pull initial batch
         self.player_input.look_at(self.grinder_view_direction, self.bot_state)
         self.inventory_manager.open_inv('grinder')
@@ -629,10 +635,10 @@ class SortLootAndGrindTask(BaseTask):
                 time.sleep(1)
                 break
             tries += 1
-            info(f"Grinder still has items; storing metal chunk... (try {tries}/{max_tries})")
+            debug(f"Grinder still has items; storing metal chunk... (try {tries}/{max_tries})")
             # Close grinder, store metal, then re-open and take next batch
             self.inventory_manager.close_inv()
-            time.sleep(1)
+            time.sleep(2)
             self.player_input.get_calibration_view_direction('grinder')
             self.store_metal()
             # Failsafe: after max_tries, run resource sorting once to relieve pressure
@@ -648,13 +654,14 @@ class SortLootAndGrindTask(BaseTask):
                 still_full = not self.player_input.slot_empty(getattr(self.player_input, 'first_slot_grinder_scan', None))
                 if still_full:
                     self.inventory_manager.close_inv()
+                    time.sleep(1)
                     raise RestartTask("grind_inventory_metal_first stuck after failsafe")
             # Re-open grinder for next batch
             self.player_input.look_at(self.grinder_view_direction, self.bot_state)
             self.inventory_manager.open_inv('grinder')
             self.inventory_manager.take_all()
             time.sleep(0.15)
-        info("Metal-first presorting loop finished.")
+        debug("Metal-first presorting loop finished.")
 
 
 class CollectAndCrackAllGachasTask(BaseTask):
@@ -824,13 +831,13 @@ class FeedAllGachasMajorTask(BaseTask):
         with open(crop_plot_path, "r") as f:
             crop_plot_cfg = json.load(f)
         crop_plots = crop_plot_cfg.get("crop_plot_look_positions", [])
-        if len(crop_plots) < 24:
-            warn(f"Expected 24 crop plot look positions; found {len(crop_plots)}")
+        if len(crop_plots) < 32:
+            warn(f"Expected 32 crop plot look positions; found {len(crop_plots)}")
             return
         plots = [{
             "view_direction": item.get("view_direction"),
             "crouch": bool(item.get("crouch", False)),
-        } for item in crop_plots[:24]]
+        } for item in crop_plots[:32]]
 
         # Resume support: box index and stage
         start_idx = int(getattr(self.bot_state, 'major_checkpoint_idx', 0) or 0)
@@ -864,7 +871,7 @@ class FeedAllGachasMajorTask(BaseTask):
             if start_stage is None or start_stage == stages[0]:
                 run_stage('gettraps', lambda: (
                     self.player_input.teleport_to(tp_plots, self.bot_state) if tp_plots else None,
-                    GetTrapsTask(self.bot_state, self.player_input, self.inventory_manager, crop_plots=plots, indices=range(0, 24)).run()
+                    GetTrapsTask(self.bot_state, self.player_input, self.inventory_manager, crop_plots=plots, indices=range(0, 32)).run()
                 ))
             # Always run FeedGachaTask after GetTrapsTask, unless a RestartTask was raised
             # 2. Teleport to box and feed Gacha 1

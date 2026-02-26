@@ -1060,11 +1060,11 @@ class OCR:
                         return self.wait_for_text(region, expected_texts, click, bot_state, None, False)
             else:
                 if not recovery:
-                    error("Recovery handler not provided; skipping recovery.")
+                    warn("\033[33mReset view\033[0m")
                 if not retry_after_recovery:
                     error("retry_after_recovery disabled; skipping recovery.")
                 if not bot_state:
-                    error("bot_state is None; recovery cannot track or restart task.")
+                    debug("bot_state is None; recovery cannot track or restart task.")
             return False, ""
 
     def wait_for_no_text(self, region: Tuple[int, int, int, int], expected_texts: List[str], timeout=10, bot_state: Optional[BotState] = None, recovery: Optional['Recovery'] = None, retry_after_recovery: bool = True)-> bool:
@@ -1120,11 +1120,11 @@ class OCR:
                         return self.wait_for_no_text(region, expected_texts, timeout, bot_state, None, False)
             else:
                 if not recovery:
-                    warn("Recovery handler not provided; skipping recovery.")
+                    warn("\033[33mReset view\033[0m")
                 if not retry_after_recovery:
                     warn("retry_after_recovery disabled; skipping recovery.")
                 if not bot_state:
-                    warn("bot_state is None; recovery cannot track or restart task.")
+                    debug("bot_state is None; recovery cannot track or restart task.")
             return False
         finally:
             # Stop the display thread
@@ -1177,7 +1177,7 @@ class Recovery:
         try:
             self.player_input.calibrate_current_view(bot_state)
         except Exception as e:
-            warn(f"Recovery: calibrate_current_view failed: {e}")
+            debug(f"Recovery: calibrate_current_view failed: {e}")
         return True
 
     def proceed_post_reset(self, bot_state: BotState) -> bool:

@@ -104,6 +104,22 @@
       "crouch": false
     },
     {
+      "resource": "bgates",
+      "teleporter": "grinder",
+      "view_direction": { "yaw": -22.82, "pitch": -14.43 },
+      "is_gacha_crystal_ressource": true,
+      "is_dedi": true,
+      "crouch": false
+    },
+    {
+      "resource": "treeplat",
+      "teleporter": "grinder",
+      "view_direction": { "yaw": -25.80, "pitch": -27.90 },
+      "is_gacha_crystal_ressource": true,
+      "is_dedi": true,
+      "crouch": true
+    },
+    {
       "resource": "dust1",
       "teleporter": "grinder",
       "view_direction": { "yaw": 13.99, "pitch": 13.31 },

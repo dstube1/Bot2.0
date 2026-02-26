@@ -1,3 +1,4 @@
+#USAGE: python -m utils.calibrate_crop_plots
 import os
 import json
 import time

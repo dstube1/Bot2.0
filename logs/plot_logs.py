@@ -18,24 +18,33 @@ def load_data(logs_dir):
 			import openpyxl
 			wb = openpyxl.load_workbook(xlsx_path, data_only=True)
 			ws = wb.active
-			# Expect header row: Timestamp, RES1, RES2, ...
+			# Accept any header with a timestamp column
 			header = [c.value for c in ws[1]]
-			if not header or header[0] != "Timestamp":
-				raise ValueError("Unexpected header in grind_stats.xlsx")
-			cols = header[1:]
+			if not header:
+				raise ValueError("Missing header in grind_stats.xlsx")
+			# Find timestamp column
+			ts_idx = None
+			for i, h in enumerate(header):
+				if h and str(h).lower().startswith("timestamp"):
+					ts_idx = i
+					break
+			if ts_idx is None:
+				raise ValueError("No timestamp column found in grind_stats.xlsx header")
+			cols = [h for j, h in enumerate(header) if j != ts_idx]
 			timestamps = []
 			series = {col: [] for col in cols}
 			for row in ws.iter_rows(min_row=2, values_only=True):
 				if not row or all(v is None for v in row):
 					continue
-				ts_str = row[0]
+				ts_str = row[ts_idx]
 				if isinstance(ts_str, datetime):
 					ts = ts_str
 				else:
 					ts = datetime.strptime(str(ts_str), "%Y-%m-%d %H:%M:%S")
 				timestamps.append(ts)
-				for idx, col in enumerate(cols, start=1):
-					val = row[idx] if idx < len(row) else 0
+				for idx, col in enumerate(cols):
+					col_idx = header.index(col)
+					val = row[col_idx] if col_idx < len(row) else 0
 					try:
 						series[col].append(float(val or 0))
 					except Exception:

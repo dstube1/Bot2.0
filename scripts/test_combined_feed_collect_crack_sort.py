@@ -1,14 +1,53 @@
+
 import threading
 import time
 import os
 import sys
 import json
 import datetime
+import pyautogui
+import openpyxl
 try:
     import keyboard  # for global hotkey
     KEYBOARD_AVAILABLE = True
 except Exception:
     KEYBOARD_AVAILABLE = False
+
+# --- Runtime Tracker ---
+RUNTIME_LOG = []
+SCRIPT_START_TS = datetime.datetime.now()
+SCRIPT_END_TS = None
+def log_runtime(event, cycle=None, run=None):
+    ts = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    RUNTIME_LOG.append({
+        'timestamp': ts,
+        'event': event,
+        'cycle': cycle,
+        'run': run
+    })
+def save_runtime_log():
+    global SCRIPT_START_TS, SCRIPT_END_TS
+    logs_dir = os.path.join(os.path.dirname(__file__), '..', 'logs')
+    os.makedirs(logs_dir, exist_ok=True)
+    xlsx_path = os.path.join(logs_dir, 'runtime.xlsx')
+    # Create or load workbook
+    if os.path.exists(xlsx_path):
+        wb = openpyxl.load_workbook(xlsx_path)
+        ws = wb.active
+    else:
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.append(['ScriptStart', 'ScriptEnd', 'Event', 'Cycle', 'Run', 'Timestamp'])
+    for entry in RUNTIME_LOG:
+        ws.append([
+            SCRIPT_START_TS.strftime('%Y-%m-%d %H:%M:%S'),
+            SCRIPT_END_TS.strftime('%Y-%m-%d %H:%M:%S') if SCRIPT_END_TS else '',
+            entry['event'],
+            entry['cycle'] if entry['cycle'] is not None else '',
+            entry['run'] if entry['run'] is not None else '',
+            entry['timestamp']
+        ])
+    wb.save(xlsx_path)
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from bot.base import BotState, PlayerInput, InventoryManager, RestartTask, info, debug, warn, error
@@ -18,11 +57,15 @@ def watcher_stop_event(stop_event):
     if not KEYBOARD_AVAILABLE:
         return
     def _instant_exit():
+        global SCRIPT_END_TS
         print("F1 pressed: immediate cancellation.")
         try:
             stop_event.set()
         except Exception:
             pass
+        SCRIPT_END_TS = datetime.datetime.now()
+        log_runtime('script_end')
+        save_runtime_log()
         os._exit(0)
     try:
         keyboard.add_hotkey('F1', _instant_exit)
@@ -150,18 +193,22 @@ def load_grinder_info(player_input):
 def main():
     bot_state, player_input, inv, t, gacha_sets, gacha_boxes, grinder_tp, grinder_view = setup()
 
+    log_runtime('script_start')
+
     # --- FEED GACHAS PHASE ---
     if not gacha_sets or not gacha_boxes or grinder_tp is None or grinder_view is None:
         warn("No gacha sets/boxes or grinder info available; aborting.")
         return
 
     total_cycles = 20
-    feeds_per_cycle = 0
+    feeds_per_cycle = 2
     for cycle in range(total_cycles):
         info(f"=== Procedure Cycle {cycle+1}/{total_cycles} ===")
+        log_runtime('feedallgachas_cycle_start', cycle=cycle+1)
         # Feed All 3 times per cycle
         for feed_run in range(feeds_per_cycle):
             info(f"Starting FeedAllGachasMajorTask run {feed_run+1}/{feeds_per_cycle} for {len(gacha_sets)} sets...")
+            log_runtime('feedallgachas_run_start', cycle=cycle+1, run=feed_run+1)
             # Reset major-task checkpoints at the start of each feed run
             bot_state.major_checkpoint_idx = 0
             bot_state.major_checkpoint_stage = None
@@ -177,7 +224,9 @@ def main():
                     warn(f"FeedAllGachasMajorTask restart signaled: {rt}; will retry (attempt {attempt}/{max_attempts}).")
                     if attempt >= max_attempts:
                         warn("FeedAllGachasMajorTask: reached max attempts; proceeding to next run.")
+            log_runtime('feedallgachas_run_end', cycle=cycle+1, run=feed_run+1)
             info(f"Completed FeedAllGachasMajorTask run {feed_run+1}/{feeds_per_cycle}.")
+        log_runtime('feedallgachas_cycle_end', cycle=cycle+1)
         # Ensure player inventory is empty before collect/crack phase
         try:
             inv.open_own_inv()
@@ -192,7 +241,12 @@ def main():
         #except Exception:
         #    pass
 
+        log_runtime('collectcrack_cycle_start', cycle=cycle+1)
         info(f"Starting CollectAndCrackAllGachasTask for {len(gacha_boxes)} boxes...")
+        pyautogui.press('2')
+        time.sleep(0.5)
+        pyautogui.press('3')
+        time.sleep(0.5)
 
         # Reset collect/crack checkpoints at the start of each collect+crack phase
         bot_state.collect_checkpoint_idx = 0
@@ -240,8 +294,13 @@ def main():
                     ).run()
                 except Exception as e:
                     warn(f"Pre-retry CrackCrystalsTask failed or not applicable: {e}")
+        log_runtime('collectcrack_cycle_end', cycle=cycle+1)
 
     t.join(timeout=1.0)
+    global SCRIPT_END_TS
+    SCRIPT_END_TS = datetime.datetime.now()
+    log_runtime('script_end')
+    save_runtime_log()
     info('Full combined test finished.')
 
 if __name__ == '__main__':

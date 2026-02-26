@@ -2,7 +2,7 @@
   "gacha_sets": [
     {
       "name": "box_1",
-      "tp_box": "box1",
+      "tp_box": "box1x",
       "pego_view_direction": {
         "yaw": -131.56,
         "pitch": -29.96,

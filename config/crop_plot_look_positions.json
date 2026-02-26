@@ -1,36 +1,260 @@
 {
   "crop_plot_look_positions": [
-    { "target_name": "crop_plot_1", "view_direction": [172.74, 15.35], "crouch": false },
-    { "target_name": "crop_plot_2", "view_direction": [171.74, 4.47], "crouch": false },
-    { "target_name": "crop_plot_3", "view_direction": [171.74, -4.28], "crouch": false },
-    { "target_name": "crop_plot_4", "view_direction": [171.92, -12.85], "crouch": false },
-    { "target_name": "crop_plot_5", "view_direction": [171.74, -1.48], "crouch": true },
-    { "target_name": "crop_plot_6", "view_direction": [171.57, -8.65], "crouch": true },
-    { "target_name": "crop_plot_7", "view_direction": [171.23, -19.36], "crouch": true },
-    { "target_name": "crop_plot_8", "view_direction": [170.95, -27.09], "crouch": true },
-    { "target_name": "crop_plot_9", "view_direction": [-97.79, 13.69], "crouch": false },
-    { "target_name": "crop_plot_10", "view_direction": [-97.96, 3.36], "crouch": false },
-    { "target_name": "crop_plot_11", "view_direction": [-98.66, -4.51], "crouch": false },
-    { "target_name": "crop_plot_12", "view_direction": [-97.96, -16.05], "crouch": false },
-    { "target_name": "crop_plot_13", "view_direction": [-97.09, -1.7], "crouch": true },
-    { "target_name": "crop_plot_14", "view_direction": [-98.31, -10.45], "crouch": true },
-    { "target_name": "crop_plot_15", "view_direction": [-98.84, -19.2], "crouch": true },
-    { "target_name": "crop_plot_16", "view_direction": [-99.19, -27.42], "crouch": true },
-    { "target_name": "crop_plot_17", "view_direction": [-8.49, 16.53], "crouch": false },
-    { "target_name": "crop_plot_18", "view_direction": [-8.9, 3.93], "crouch": false },
-    { "target_name": "crop_plot_19", "view_direction": [-7.85, -5.87], "crouch": false },
-    { "target_name": "crop_plot_20", "view_direction": [-6.98, -15.14], "crouch": false },
-    { "target_name": "crop_plot_21", "view_direction": [-7.1, -1.14], "crouch": true },
-    { "target_name": "crop_plot_22", "view_direction": [-7.46, -9.96], "crouch": true },
-    { "target_name": "crop_plot_23", "view_direction": [-7.81, -18.36], "crouch": true },
-    { "target_name": "crop_plot_24", "view_direction": [-8.34, -26.06], "crouch": true },
-    { "target_name": "crop_plot_25", "view_direction": [82.44, 18.0], "crouch": false },
-    { "target_name": "crop_plot_26", "view_direction": [83.49, 3.63], "crouch": false },
-    { "target_name": "crop_plot_27", "view_direction": [82.61, -5.82], "crouch": false },
-    { "target_name": "crop_plot_28", "view_direction": [82.79, -15.09], "crouch": false },
-    { "target_name": "crop_plot_29", "view_direction": [82.49, -1.37], "crouch": true },
-    { "target_name": "crop_plot_30", "view_direction": [82.14, -10.65], "crouch": true },
-    { "target_name": "crop_plot_31", "view_direction": [83.01, -19.04], "crouch": true },
-    { "target_name": "crop_plot_32", "view_direction": [83.89, -27.62], "crouch": true }
+    {
+      "target_name": "crop_plot_1",
+      "view_direction": [
+        83.04,
+        11.22
+      ],
+      "crouch": false
+    },
+    {
+      "target_name": "crop_plot_2",
+      "view_direction": [
+        83.11,
+        2.7
+      ],
+      "crouch": false
+    },
+    {
+      "target_name": "crop_plot_3",
+      "view_direction": [
+        82.93,
+        -5.7
+      ],
+      "crouch": false
+    },
+    {
+      "target_name": "crop_plot_4",
+      "view_direction": [
+        82.76,
+        -14.27
+      ],
+      "crouch": false
+    },
+    {
+      "target_name": "crop_plot_5",
+      "view_direction": [
+        83.11,
+        -1.32
+      ],
+      "crouch": true
+    },
+    {
+      "target_name": "crop_plot_6",
+      "view_direction": [
+        82.93,
+        -10.42
+      ],
+      "crouch": true
+    },
+    {
+      "target_name": "crop_plot_7",
+      "view_direction": [
+        82.76,
+        -18.47
+      ],
+      "crouch": true
+    },
+    {
+      "target_name": "crop_plot_8",
+      "view_direction": [
+        82.93,
+        -27.4
+      ],
+      "crouch": true
+    },
+    {
+      "target_name": "crop_plot_9",
+      "view_direction": [
+        172.56,
+        11.83
+      ],
+      "crouch": false
+    },
+    {
+      "target_name": "crop_plot_10",
+      "view_direction": [
+        172.03,
+        2.56
+      ],
+      "crouch": false
+    },
+    {
+      "target_name": "crop_plot_11",
+      "view_direction": [
+        172.21,
+        -5.67
+      ],
+      "crouch": false
+    },
+    {
+      "target_name": "crop_plot_12",
+      "view_direction": [
+        171.68,
+        -15.29
+      ],
+      "crouch": false
+    },
+    {
+      "target_name": "crop_plot_13",
+      "view_direction": [
+        171.81,
+        -2.11
+      ],
+      "crouch": true
+    },
+    {
+      "target_name": "crop_plot_14",
+      "view_direction": [
+        171.64,
+        -10.86
+      ],
+      "crouch": true
+    },
+    {
+      "target_name": "crop_plot_15",
+      "view_direction": [
+        171.46,
+        -18.91
+      ],
+      "crouch": true
+    },
+    {
+      "target_name": "crop_plot_16",
+      "view_direction": [
+        170.94,
+        -27.13
+      ],
+      "crouch": true
+    },
+    {
+      "target_name": "crop_plot_17",
+      "view_direction": [
+        -97.48,
+        10.53
+      ],
+      "crouch": false
+    },
+    {
+      "target_name": "crop_plot_18",
+      "view_direction": [
+        -97.48,
+        2.49
+      ],
+      "crouch": false
+    },
+    {
+      "target_name": "crop_plot_19",
+      "view_direction": [
+        -97.31,
+        -6.26
+      ],
+      "crouch": false
+    },
+    {
+      "target_name": "crop_plot_20",
+      "view_direction": [
+        -97.48,
+        -15.54
+      ],
+      "crouch": false
+    },
+    {
+      "target_name": "crop_plot_21",
+      "view_direction": [
+        -97.48,
+        -2.59
+      ],
+      "crouch": true
+    },
+    {
+      "target_name": "crop_plot_22",
+      "view_direction": [
+        -97.13,
+        -10.64
+      ],
+      "crouch": true
+    },
+    {
+      "target_name": "crop_plot_23",
+      "view_direction": [
+        -97.16,
+        -19.04
+      ],
+      "crouch": true
+    },
+    {
+      "target_name": "crop_plot_24",
+      "view_direction": [
+        -97.39,
+        -26.22
+      ],
+      "crouch": true
+    },
+    {
+      "target_name": "crop_plot_25",
+      "view_direction": [
+        -5.94,
+        11.61
+      ],
+      "crouch": false
+    },
+    {
+      "target_name": "crop_plot_26",
+      "view_direction": [
+        -6.46,
+        2.33
+      ],
+      "crouch": false
+    },
+    {
+      "target_name": "crop_plot_27",
+      "view_direction": [
+        -6.49,
+        -6.0
+      ],
+      "crouch": false
+    },
+    {
+      "target_name": "crop_plot_28",
+      "view_direction": [
+        -6.32,
+        -14.92
+      ],
+      "crouch": false
+    },
+    {
+      "target_name": "crop_plot_29",
+      "view_direction": [
+        -6.67,
+        -2.67
+      ],
+      "crouch": true
+    },
+    {
+      "target_name": "crop_plot_30",
+      "view_direction": [
+        -7.19,
+        -11.42
+      ],
+      "crouch": true
+    },
+    {
+      "target_name": "crop_plot_31",
+      "view_direction": [
+        -7.19,
+        -19.3
+      ],
+      "crouch": true
+    },
+    {
+      "target_name": "crop_plot_32",
+      "view_direction": [
+        -7.02,
+        -25.77
+      ],
+      "crouch": true
+    }
   ]
 }
