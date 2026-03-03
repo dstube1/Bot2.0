@@ -1,3 +1,5 @@
+# Ignore Python bytecode cache directories
+__pycache__/
 # Ignore Excel and PNG files in logs/
 logs/*.xlsx
 logs/*.png
