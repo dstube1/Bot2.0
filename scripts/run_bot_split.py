@@ -128,7 +128,9 @@ def main():
 
     info("Calibrating current view. Bring ARK to foreground; sending 'ccc' in 3s...")
     time.sleep(3)
-    player_input.calibrate_current_view(bot_state)
+
+    player_input.wake_up(bot_state)
+
 
     # Load gacha boxes and grinder info
     boxes = load_gacha_boxes(player_input)
@@ -291,3 +293,6 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+
+

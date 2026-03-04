@@ -870,12 +870,17 @@ class OCR:
             import dxcam  # type: ignore
             cam = dxcam.create(output_idx=0)
             frame = cam.grab(region=(left, top, right, bottom))
+            result = None
             if frame is not None:
                 # frame is BGRA or BGR
                 if len(frame.shape) == 3 and frame.shape[2] == 4:
-                    return cv2.cvtColor(frame, cv2.COLOR_BGRA2RGB)
+                    result = cv2.cvtColor(frame, cv2.COLOR_BGRA2RGB)
                 elif len(frame.shape) == 3 and frame.shape[2] == 3:
-                    return cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                    result = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            del cam
+            del frame
+            if result is not None:
+                return result
         except Exception:
             pass
         # 2) mss
@@ -885,18 +890,31 @@ class OCR:
                 mon = {"left": int(left), "top": int(top), "width": int(width), "height": int(height)}
                 sct_img = sct.grab(mon)  # BGRA
                 arr = np.array(sct_img)
-                return cv2.cvtColor(arr, cv2.COLOR_BGRA2RGB)
+                result = cv2.cvtColor(arr, cv2.COLOR_BGRA2RGB)
+                del sct_img
+                del arr
+                return result
         except Exception:
             pass
         # 3) pyautogui
         try:
             pil_img = pyautogui.screenshot(region=(int(left), int(top), int(width), int(height)))
-            return np.array(pil_img)  # PIL screenshot returns RGB
+            arr = np.array(pil_img)
+            pil_img.close()
+            del pil_img
+            result = arr
+            del arr
+            return result  # PIL screenshot returns RGB
         except Exception:
             pass
         # 4) PIL.ImageGrab
         pil_img = ImageGrab.grab(bbox=(int(left), int(top), int(right), int(bottom)))
-        return np.array(pil_img)
+        arr = np.array(pil_img)
+        pil_img.close()
+        del pil_img
+        result = arr
+        del arr
+        return result
 
     def recognize_text(self, region: tuple[int, int, int, int]) -> str:
         """
