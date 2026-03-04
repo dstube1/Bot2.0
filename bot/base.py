@@ -984,6 +984,10 @@ class OCR:
                 return (0, 0, int(w), int(h))
         raise ValueError(f"Invalid region format: {region}")
 
+    '''
+
+    REMOVED DUE TO MEMORY LEAK / RESOURCE CLEANUP ISSUES WITH TKINTER IN THREADS. CAN REINTRODUCE LATER WITH PROPER LIFECYCLE MANAGEMENT.
+
     def create_overlay_window(self, region: Tuple[int, int, int, int]) -> tk.Tk:
         """
         Create a transparent overlay window with a red box frame.
@@ -992,6 +996,7 @@ class OCR:
         Returns:
             tk.TK: Creates the red box.
         """
+        # ...existing code...
         root = tk.Tk()
         root.attributes('-topmost', True)
         root.attributes('-alpha', 0.3)  # Set transparency level
@@ -1013,12 +1018,20 @@ class OCR:
             region (tuple): The region to capture (left_top_x, left_top_y, bottom_left_x, bottom_left_y).
         """
         overlay_window = self.create_overlay_window(region)
-        while getattr(threading.current_thread(), "do_run", True):
-            overlay_window.update_idletasks()
-            overlay_window.update()
-            time.sleep(0.01)
-        overlay_window.destroy()  # Close the tkinter window when the thread stops
+        try:
+            while getattr(threading.current_thread(), "do_run", True):
+                overlay_window.update_idletasks()
+                overlay_window.update()
+                time.sleep(0.01)
+        finally:
+            # Attempt to quit Tkinter main loop before destroying window
+            try:
+                overlay_window.quit()
+            except Exception:
+                pass
+            overlay_window.destroy()  # Close the tkinter window when the thread stops
 
+    '''
 
     def wait_for_text(self, region: Tuple[int, int, int, int], expected_texts: List[str], click=False, bot_state: Optional[BotState] = None, recovery: Optional['Recovery'] = None, retry_after_recovery: bool = True)-> Tuple[bool, str]:
         """
@@ -1030,29 +1043,38 @@ class OCR:
 
         Returns (True, cleaned_text) on success or (False, "") on failure.
         """
+        # ...existing code...
         region = self._normalize_region(region)
         # Start the thread to display the region
-        display_thread = threading.Thread(target=self.display_region, args=(region,))
-        display_thread.start()
+        ##### MEMORY LEAK ####################display_thread = threading.Thread(target=self.display_region, args=(region,))
+        ##### MEMORY LEAK ####################display_thread.start()
         success = False
         cleaned_text = ""
-        try:
-            for _ in range(100):
-                read_text = self.recognize_text(region)
-                cleaned_text = read_text.replace(' ', '').replace('\n', '').replace('\r', '')
-                upper_clean = cleaned_text.upper()
-                for expected_text in expected_texts:
-                    if expected_text.upper() in upper_clean:
-                        debug(f'Detected "{expected_text}" in region {region}....proceeding')
-                        if click:
-                            pyautogui.click()
-                            time.sleep(0.05)
-                        success = True
-                        return True, cleaned_text
-                time.sleep(0.2)
+
+        for _ in range(100):
+            read_text = self.recognize_text(region)
+            cleaned_text = read_text.replace(' ', '').replace('\n', '').replace('\r', '')
+            upper_clean = cleaned_text.upper()
+            for expected_text in expected_texts:
+                if expected_text.upper() in upper_clean:
+                    debug(f'Detected "{expected_text}" in region {region}....proceeding')
+                    if click:
+                        pyautogui.click()
+                        time.sleep(0.05)
+                    success = True
+                    return True, cleaned_text
+            time.sleep(0.2)
+        """
+
+        Removed tkinter overlay code for now to avoid potential issues with thread cleanup and resource leaks. The display_region function and related threading code can be reintroduced later with proper lifecycle management if desired.
         finally:
             display_thread.do_run = False
-            display_thread.join()
+            display_thread.join(timeout=2)
+            # If thread is still alive, warn and forcibly exit
+            if display_thread.is_alive():
+                import warnings
+                warnings.warn("display_thread did not exit cleanly; possible resource leak.")
+        """
 
         if not success:
             debug("wait_for_text: Requested text not found!")
@@ -1098,56 +1120,62 @@ class OCR:
         """
         start_time = time.time()
         # Start the thread to display the region
-        display_thread = threading.Thread(target=self.display_region, args=(region,))
-        display_thread.start()
-        try:
-            region = self._normalize_region(region)
-            while time.time() - start_time < timeout:
-                read_text = self.recognize_text(region)
-                cleaned_text = read_text.replace(' ', '').replace('\n', '').replace('\r', '')
-                upper_clean = cleaned_text.upper()
-                # If any expected text is still present, continue waiting
-                still_present = False
-                for expected_text in expected_texts:
-                    if expected_text.upper() in upper_clean:
-                        still_present = True
-                        break
-                if not still_present:
-                        time.sleep(0.1)
-                        return True
-                time.sleep(0.1)
-            # Failure path
-            if recovery and retry_after_recovery:
-                if bot_state:
-                    bot_state.last_failed_step = bot_state.current_task
-                    bot_state.last_action_success = False
-                    bot_state.recovery_count += 1
-                warn("wait_for_no_text: text still present; initiating recovery...")
-                if recovery.reset_player(bot_state):
-                    debug("Recovery successful.")
-                    if bot_state and bot_state.current_task_obj:
-                        bot_state.recovery_restarts += 1
-                        debug(f"Signaling restart for task '{bot_state.current_task}' after recovery.")
-                        bot_state.restart_requested = True
-                        raise RestartTask(f"Restart signal for: {bot_state.current_task}")
-                    elif not bot_state or not bot_state.current_task_obj:
-                        error("No current_task_obj set; aborting current flow to avoid mid-step continuation.")
-                        raise RestartTask("Abort current flow: recovery executed but no task object to restart.")
-                    else:
-                        warn("Restart limit reached; performing single no-text retry.")
-                        return self.wait_for_no_text(region, expected_texts, timeout, bot_state, None, False)
-            else:
-                if not recovery:
-                    warn("\033[33mReset view\033[0m")
-                if not retry_after_recovery:
-                    warn("retry_after_recovery disabled; skipping recovery.")
-                if not bot_state:
-                    debug("bot_state is None; recovery cannot track or restart task.")
-            return False
+        ##### MEMORY LEAK ##################display_thread = threading.Thread(target=self.display_region, args=(region,))
+        ##### MEMORY LEAK ##################display_thread.start()
+        #try:
+        region = self._normalize_region(region)
+        while time.time() - start_time < timeout:
+            read_text = self.recognize_text(region)
+            cleaned_text = read_text.replace(' ', '').replace('\n', '').replace('\r', '')
+            upper_clean = cleaned_text.upper()
+            # If any expected text is still present, continue waiting
+            still_present = False
+            for expected_text in expected_texts:
+                if expected_text.upper() in upper_clean:
+                    still_present = True
+                    break
+            if not still_present:
+                    time.sleep(0.1)
+                    return True
+            time.sleep(0.1)
+        # Failure path
+        if recovery and retry_after_recovery:
+            if bot_state:
+                bot_state.last_failed_step = bot_state.current_task
+                bot_state.last_action_success = False
+                bot_state.recovery_count += 1
+            warn("wait_for_no_text: text still present; initiating recovery...")
+            if recovery.reset_player(bot_state):
+                debug("Recovery successful.")
+                if bot_state and bot_state.current_task_obj:
+                    bot_state.recovery_restarts += 1
+                    debug(f"Signaling restart for task '{bot_state.current_task}' after recovery.")
+                    bot_state.restart_requested = True
+                    raise RestartTask(f"Restart signal for: {bot_state.current_task}")
+                elif not bot_state or not bot_state.current_task_obj:
+                    error("No current_task_obj set; aborting current flow to avoid mid-step continuation.")
+                    raise RestartTask("Abort current flow: recovery executed but no task object to restart.")
+                else:
+                    warn("Restart limit reached; performing single no-text retry.")
+                    return self.wait_for_no_text(region, expected_texts, timeout, bot_state, None, False)
+        else:
+            if not recovery:
+                warn("\033[33mReset view\033[0m")
+            if not retry_after_recovery:
+                warn("retry_after_recovery disabled; skipping recovery.")
+            if not bot_state:
+                debug("bot_state is None; recovery cannot track or restart task.")
+        return False
+        """
+        Removed tkinter overlay code for now to avoid potential issues with thread cleanup and resource leaks. The display_region function and related threading code can be reintroduced later with proper lifecycle management if desired.
+        
         finally:
+            time.sleep(0.01)  # Brief pause to ensure any pending GUI updates are processed before closing overlay
+            
             # Stop the display thread
             display_thread.do_run = False
             display_thread.join()
+        """
         
 
 class Recovery:
