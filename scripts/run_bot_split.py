@@ -176,7 +176,7 @@ def main():
         attempt = 0
         while attempt < max_attempts:
             try:
-                #FeedAllGachasMajorTask(bot_state, player_input, inv, boxes).run()
+                FeedAllGachasMajorTask(bot_state, player_input, inv, boxes).run()
                 break
             except RestartTask as rt:
                 attempt += 1
