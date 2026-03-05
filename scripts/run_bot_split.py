@@ -222,6 +222,12 @@ def main():
             warn("No boxes 1-6 found for collect and crack.")
         log_runtime('collectcrack_1_6_end', cycle=cycle+1)
 
+        try:
+            inv.open_own_inv()
+            inv.drop_all()
+        finally:
+            inv.close_inv()
+
         # Feed all boxes again
         info("=== FeedAllGachasMajorTask (all boxes, between cracks) ===")
         log_runtime('feedallgachas_between_start', cycle=cycle+1)
@@ -276,6 +282,12 @@ def main():
         else:
             warn("No boxes 7-12 found for collect and crack.")
         log_runtime('collectcrack_7_12_end', cycle=cycle+1)
+
+        try:
+            inv.open_own_inv()
+            inv.drop_all()
+        finally:
+            inv.close_inv()
 
         info(f"=== Finished split bot cycle {cycle+1}/{num_cycles} ===")
         pyautogui.press('2')
