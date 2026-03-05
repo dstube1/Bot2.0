@@ -357,33 +357,51 @@ class SortLootAndGrindTask(BaseTask):
 
 
     def sort_loot(self):
-        """Keep desired loot and move it to a loot storage (if configured).
-
-        Base approach: for each keep filter, set player's inventory filter then Store All into loot storage.
-        """
+        """Keep desired loot and move it to the first available (not full) vault for all keep_filters."""
         if not self.keep_filters:
             return
-        if self.loot_storage_teleporter is None:
-            warn("SortLootAndGrindTask: loot storage not configured; skipping loot sorting.")
+
+        # Define vaults and their full flags
+        vaults = [
+            {"name": "poly_vault1", "full_flag": "poly_vault1_full", "view": self.player_input.get_calibration_view_direction("poly_vault")},
+            {"name": "poly_vault2", "full_flag": "poly_vault2_full", "view": self.player_input.get_calibration_view_direction("poly_vault2")},
+            {"name": "poly_vault3", "full_flag": "poly_vault3_full", "view": self.player_input.get_calibration_view_direction("poly_vault3")},
+        ]
+
+        # Find the first available (not full) vault
+        selected_vault = None
+        for vault in vaults:
+            if not getattr(self.bot_state, vault["full_flag"], False):
+                selected_vault = vault
+                break
+
+        if selected_vault is None:
+            warn("All vaults are full. Cannot store loot.")
             return
-        if self.loot_storage_view_direction is not None:
-            self.player_input.look_at(self.loot_storage_view_direction, self.bot_state)
+
+        # Look at the selected vault
+        if selected_vault["view"] is not None:
+            self.player_input.look_at(selected_vault["view"], self.bot_state)
         time.sleep(0.2)
-        debug("Sorting poly loot to loot storage...")
-        for flt in self.keep_filters:
-            # Filter and store kept items
-            self.inventory_manager.open_inv()
-            try:
+        debug(f"Sorting loot to {selected_vault['name']}...")
+        self.inventory_manager.open_inv()
+        try:
+            for flt in self.keep_filters:
                 inp = self.inventory_manager.input
                 if getattr(inp, 'textfield_left', None):
                     inp.enter_text(inp.textfield_left, flt)
                 self.inventory_manager.store_all()
                 if getattr(inp, 'textfield_left', None):
                     inp.enter_text(inp.textfield_left, "")
-            finally:
-                if self.is_vault_full():
-                    self.do_vault_full_task()
-        self.inventory_manager.close_inv()
+                # Check if vault is full after 
+                full = self.is_vault_full()
+                if full:
+                    setattr(self.bot_state, selected_vault["full_flag"], True)
+                    debug(f"{selected_vault['name']} is now full. Marking as full.")
+                    warn(f"{selected_vault['name']} became full during storing. Aborting further loot storage.")
+                    break
+        finally:
+            self.inventory_manager.close_inv()
         time.sleep(0.5)
 
     def grind_junk(self):
@@ -432,14 +450,47 @@ class SortLootAndGrindTask(BaseTask):
         finally:
             info("Grinded junk and sorted")
 
-    def is_vault_full(self) -> bool:
-        """Dummy check for whether the poly vault (loot storage) is full.
-
-        Future implementation could read the slot count from UI via OCR.
-        For now, always returns False.
+    def is_vault_full(self, limit=350) -> bool:
         """
-        # Placeholder: always not full
-        return False
+        Check if the vault is full by detecting the text 'xxx / 350' or 'xxx \ 350'.
+        Always uses the region for 'vault_slots' from scan_windows.json.
+
+        Args:
+            limit (int): The slot limit to check against.
+
+        Returns:
+            bool: True if the slots exceed the limit, False otherwise.
+        """
+        import re
+        info("Checking if vault is full...")
+        region = getattr(self.player_input, 'vault_slots', None)
+        if region is None:
+            error("is_vault_full: No scan region found for 'vault_slots' in scan_windows.json")
+            return False
+
+        expected_texts = ['/350', '\350']
+        found, read_text = self.player_input.ocr.wait_for_text(region, expected_texts, False)
+        if found:
+            try:
+                match = re.search(r'(\d+)(/|\\)350', read_text)
+                if match:
+                    occupied_slots = int(match.group(1))
+                    debug(f"Occupied slots: {occupied_slots}")
+                    if occupied_slots >= limit:
+                        debug(f"Vault is full: {occupied_slots} / 350 slots")
+                        return True
+                    else:
+                        debug(f"Vault is not full: {occupied_slots} / 350")
+                        return False
+                else:
+                    error("Pattern not found in the cleaned text.")
+                    return False
+            except ValueError:
+                error("Error parsing the number of occupied slots.")
+                return False
+        else:
+            error("Vault Slots not found.")
+            return False
 
     def do_vault_full_task(self) -> None:
         """Dummy task executed when the vault is detected as full.

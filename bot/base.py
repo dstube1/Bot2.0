@@ -82,6 +82,10 @@ class BotState:
         # Inventory UI state tracking
         self.inventory_open = False         # True if any inventory UI is open
         self.inventory_type = None          # 'own', 'teleporter', or a custom label
+        # Vault full flags
+        self.poly_vault1_full = False
+        self.poly_vault2_full = False
+        self.poly_vault3_full = False
 
 
 class RestartTask(Exception):
@@ -199,6 +203,7 @@ class PlayerInput:
             # Optional: region for first grinder inventory slot (for metal presorting loop)
             self.first_slot_grinder_scan = find_scan("first_slot_grinder")
             self.grinder_slots = find_scan("grinder_slots")
+            self.vault_slots = find_scan("vault_slots")
             # Player HUD metric: weight
             self.player_weight_scan = find_scan("player_weight")
             # Dedicated storage amount banner
