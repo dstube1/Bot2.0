@@ -462,7 +462,7 @@ class SortLootAndGrindTask(BaseTask):
             bool: True if the slots exceed the limit, False otherwise.
         """
         import re
-        info("Checking if vault is full...")
+        debug("Checking if vault is full...")
         region = getattr(self.player_input, 'vault_slots', None)
         if region is None:
             error("is_vault_full: No scan region found for 'vault_slots' in scan_windows.json")
