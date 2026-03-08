@@ -100,6 +100,7 @@ class GetTrapsTask(BaseTask):
             self.inventory_manager.open_inv()
             # Assumes 'trap' is the item to pull from each plot
             self.inventory_manager.take_item("trap")
+            self.inventory_manager.store_all()  # store all, in case fertilizer has been pulled from plots
             self.inventory_manager.close_inv()
             time.sleep(0.2)  # small delay between plots
         # After collecting all traps, stand up if crouched to restore neutral state
