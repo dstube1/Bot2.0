@@ -100,7 +100,7 @@ class GetTrapsTask(BaseTask):
             self.inventory_manager.open_inv()
             # Assumes 'trap' is the item to pull from each plot
             self.inventory_manager.take_item("trap")
-            self.inventory_manager.store_all()  # store all, in case fertilizer has been pulled from plots
+            self.inventory_manager.store_all()  #  TEMP FIX !!! store all, in case fertilizer has been pulled from plots
             self.inventory_manager.close_inv()
             time.sleep(0.2)  # small delay between plots
         # After collecting all traps, stand up if crouched to restore neutral state
@@ -477,8 +477,8 @@ class SortLootAndGrindTask(BaseTask):
                 if match:
                     occupied_slots = int(match.group(1))
                     debug(f"Occupied slots: {occupied_slots}")
-                    if occupied_slots >= limit:
-                        debug(f"Vault is full: {occupied_slots} / 350 slots")
+                    if occupied_slots == limit:
+                        info(f"Vault is full: {occupied_slots} / 350 slots")
                         return True
                     else:
                         debug(f"Vault is not full: {occupied_slots} / 350")
@@ -892,16 +892,17 @@ class FeedAllGachasMajorTask(BaseTask):
         } for item in crop_plots[:32]]
 
         # Resume support: box index and stage
+
         start_idx = int(getattr(self.bot_state, 'major_checkpoint_idx', 0) or 0)
         start_stage = getattr(self.bot_state, 'major_checkpoint_stage', None)
         stages = ('gettraps', 'feed_gacha1', 'feed_gacha2')
 
         for idx, box in enumerate(sets):
+            # For the first box after recovery, use the checkpointed stage; for all others, start from the beginning
+            this_box_stage = start_stage if idx == start_idx else None
             if idx < start_idx:
                 continue
-            # Always reset last_action_success at the start of each box
             self.bot_state.last_action_success = True
-            # Cycle through 4 sets of plots: plots1, plots2, plots3, plots4
             plots_cycle = ["plots1", "plots2", "plots3", "plots4"]
             tp_plots = plots_cycle[idx % 4]
             tp_box = box.get("tp_box")
@@ -915,28 +916,22 @@ class FeedAllGachasMajorTask(BaseTask):
                     func()
                 except RestartTask as rt:
                     warn(f"FeedAllGachasMajorTask: restart at box {idx+1} stage '{stage_name}': {rt}")
-                    # Keep checkpoint and abort major run to resume next time
                     raise
 
             info(f"Feeding Box {idx+1}/{len(sets)} using {tp_plots}")
-            # 1. Get traps from selected plots
-            if start_stage is None or start_stage == stages[0]:
+            if this_box_stage is None or this_box_stage == stages[0]:
                 run_stage('gettraps', lambda: (
                     self.player_input.teleport_to(tp_plots, self.bot_state) if tp_plots else None,
                     GetTrapsTask(self.bot_state, self.player_input, self.inventory_manager, crop_plots=plots, indices=range(0, 32)).run()
                 ))
-            # Always run FeedGachaTask after GetTrapsTask, unless a RestartTask was raised
-            # 2. Teleport to box and feed Gacha 1
             run_stage('feed_gacha1', lambda: (
                 self.player_input.teleport_to(tp_box, self.bot_state) if tp_box else None,
                 FeedGachaTask(self.bot_state, self.player_input, self.inventory_manager, tp_box, g1_view).run() if (tp_box and g1_view) else None
             ))
-            # 3. Feed Gacha 2 (already at box)
             run_stage('feed_gacha2', lambda: (
                 FeedGachaTask(self.bot_state, self.player_input, self.inventory_manager, tp_box, g2_view).run() if (tp_box and g2_view) else None
             ))
 
-            # Completed box; advance checkpoint
             self.bot_state.major_checkpoint_idx = idx + 1
             self.bot_state.major_checkpoint_stage = None
 
