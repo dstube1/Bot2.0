@@ -1,6 +1,11 @@
+
+# === Plot Range Option ===
+# Set to '24h', '7d', or '30d' to plot last 24 hours, 7 days, or 30 days. Set to None to plot all data.
+TIME_RANGE = '24h'  # Options: '24h', '7d', '30d', or None
+
 import os
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 def load_data(logs_dir):
@@ -151,6 +156,7 @@ def plot_series(timestamps, series, cols, output_path=None):
 
 
 def main():
+
 	# Allow running from anywhere
 	script_dir = os.path.dirname(os.path.abspath(__file__))
 	logs_dir = script_dir
@@ -160,6 +166,27 @@ def main():
 	except Exception as e:
 		print(f"Error loading data: {e}")
 		sys.exit(1)
+
+	# === Filter by TIME_RANGE ===
+	if TIME_RANGE is not None:
+		now = datetime.now()
+		if TIME_RANGE == '24h':
+			cutoff = now - timedelta(hours=24)
+		elif TIME_RANGE == '7d':
+			cutoff = now - timedelta(days=7)
+		elif TIME_RANGE == '30d':
+			cutoff = now - timedelta(days=30)
+		else:
+			print(f"Unknown TIME_RANGE: {TIME_RANGE}, using all data.")
+			cutoff = None
+		if cutoff:
+			# Find indices where timestamp >= cutoff
+			filtered = [(ts, {col: series[col][i] for col in cols})
+						for i, ts in enumerate(timestamps) if ts >= cutoff]
+			if filtered:
+				timestamps = [ts for ts, _ in filtered]
+				for col in cols:
+					series[col] = [row[col] for _, row in filtered]
 
 	output_path = os.path.join(logs_dir, "grind_stats.png")
 	try:
