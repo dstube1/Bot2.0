@@ -1,0 +1,7 @@
+{
+  "degree_to_pixel_factor": {
+    "x":  0.17498,
+    "y": -0.17498
+  },
+  "Logging": "INFO"
+}

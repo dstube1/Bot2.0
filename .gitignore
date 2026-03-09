@@ -10,5 +10,3 @@ todo.txt
 # Ignore config folder and all JSON files inside
 config/
 config/*.json
-config_bak/
-config_bak/*.json
