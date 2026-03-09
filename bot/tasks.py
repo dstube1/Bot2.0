@@ -391,9 +391,11 @@ class SortLootAndGrindTask(BaseTask):
                 inp = self.inventory_manager.input
                 if getattr(inp, 'textfield_left', None):
                     inp.enter_text(inp.textfield_left, flt)
+                    time.sleep(0.5)
                 self.inventory_manager.store_all()
-                if getattr(inp, 'textfield_left', None):
-                    inp.enter_text(inp.textfield_left, "")
+                time.sleep(0.2)
+                #if getattr(inp, 'textfield_left', None):
+                #    inp.enter_text(inp.textfield_left, "")
                 # Check if vault is full after 
                 full = self.is_vault_full()
                 if full:
@@ -593,6 +595,9 @@ class SortLootAndGrindTask(BaseTask):
                 time.sleep(0.2)
             except Exception as e:
                 warn(f"sort_resources_from_grinding: error at '{d.get('name') or d.get('resource')}': {e}")
+        self.inventory_manager.open_own_inv()
+        self.inventory_manager.drop_all()
+        self.inventory_manager.close_inv()
         # Ensure we leave crouch state off at the end to not affect subsequent tasks
         try:
             if bool(self.bot_state.is_crouching):
@@ -813,6 +818,8 @@ class CollectAndCrackAllGachasTask(BaseTask):
                 self.player_input,
                 self.inventory_manager
             ).run())
+
+            
 
             # Completed box; advance checkpoint to next and clear stage
             self.bot_state.collect_checkpoint_idx = idx + 1
