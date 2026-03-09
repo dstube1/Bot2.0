@@ -6,3 +6,6 @@ logs/*.png
 assets/first_slot.png
 assets/grinder_slot_tmp.png
 todo.txt
+# Ignore config folder and all JSON files inside
+config/
+config/*.json
