@@ -2,7 +2,7 @@
 from abc import ABC, abstractmethod
 import pyautogui
 import os
-from bot.base import BotState, PlayerInput, InventoryManager, RestartTask, debug, info, warn, error
+from base import BotState, PlayerInput, InventoryManager, RestartTask, debug, info, warn, error
 import time
 import json
 
@@ -652,9 +652,9 @@ class SortLootAndGrindTask(BaseTask):
                 warn(f"Failed to save accumulated grind stats: {e}")
 
     def store_metal(self):
-        """Store metal, wood, and stone to their dedicated storage(s) defined in didi.json.
+        """Store metal and wood to their dedicated storage(s) defined in didi.json.
 
-        Expects dedis entries with resource == 'metal', 'wood', or 'stone' and optional view_direction.
+        Expects dedis entries with resource == 'metal', 'wood' and optional view_direction.
         """
         data = self.player_input.load_json("didi.json")
         dedis = data.get("dedis", [])
@@ -733,7 +733,7 @@ class CollectAndCrackAllGachasTask(BaseTask):
       grinder_teleporter: <teleporter name>,
       grinder_view_direction: <yaw,pitch>
     """
-    def __init__(self, bot_state: BotState, player_input: PlayerInput, inventory_manager: InventoryManager, gacha_boxes=None, grinder_teleporter=None, grinder_view_direction=None, per_box_collect_count: int = 1, per_box_crack_count: int = 1):
+    def __init__(self, bot_state: BotState, player_input: PlayerInput, inventory_manager: InventoryManager, gacha_boxes=None, grinder_teleporter=None, grinder_view_direction=None, per_box_collect_count: int = 1, per_box_crack_count: int = 1, idx_shift: int = 0):
         self.bot_state = bot_state
         self.player_input = player_input
         self.inventory_manager = inventory_manager
@@ -743,6 +743,7 @@ class CollectAndCrackAllGachasTask(BaseTask):
         self.grinder_view_direction = grinder_view_direction
         self.per_box_collect_count = max(1, int(per_box_collect_count))
         self.per_box_crack_count = max(1, int(per_box_crack_count))
+        self.idx_shift = idx_shift
 
     def run(self):
         # If boxes list is empty, attempt to load from config again
@@ -773,23 +774,23 @@ class CollectAndCrackAllGachasTask(BaseTask):
                 # set checkpoint and execute stage, re-raise RestartTask to abort
                 self.bot_state.collect_checkpoint_idx = idx
                 self.bot_state.collect_checkpoint_stage = stage_name
-                debug(f"Checkpoint set: idx={idx+1}/{len(self.gacha_boxes)} stage='{stage_name}'")
+                debug(f"Checkpoint set: idx={idx+1+self.idx_shift}/{len(self.gacha_boxes)+self.idx_shift} stage='{stage_name}'")
                 try:
                     func()
                     # Clear stage after successful completion of this stage
                     self.bot_state.collect_checkpoint_stage = None
-                    debug(f"Checkpoint stage cleared after '{stage_name}' for box {idx+1}")
+                    debug(f"Checkpoint stage cleared after '{stage_name}' for box {idx+1+self.idx_shift}")
                 except RestartTask as rt:
-                    warn(f"CollectAndCrackAllGachasTask: restart at box {idx+1} stage '{stage_name}': {rt}")
+                    warn(f"CollectAndCrackAllGachasTask: restart at box {idx+1+self.idx_shift} stage '{stage_name}': {rt}")
                     raise
                 except Exception as e:
                     # Convert unexpected errors into RestartTask so the driver can retry cleanly
-                    warn(f"CollectAndCrackAllGachasTask: unexpected error at box {idx+1} stage '{stage_name}': {e}")
+                    warn(f"CollectAndCrackAllGachasTask: unexpected error at box {idx+1+self.idx_shift} stage '{stage_name}': {e}")
                     raise RestartTask(f"unexpected error during {stage_name}: {e}")
 
             # Collect Pego crystals
             if start_stage is None or start_stage == stages[0]:
-                info(f"Collecting box {idx+1}/{len(self.gacha_boxes)}")
+                info(f"Collecting box {idx+1+self.idx_shift}/{len(self.gacha_boxes)+self.idx_shift}")
                 run_stage('collect', lambda: CollectCrystalsTask(
                     self.bot_state,
                     self.player_input,
@@ -801,7 +802,7 @@ class CollectAndCrackAllGachasTask(BaseTask):
 
             # Crack crystals at grinder
             if start_stage is None or start_stage in (stages[1], stages[0]):
-                info(f"Cracking box {idx+1}/{len(self.gacha_boxes)}")
+                info(f"Cracking box {idx+1+self.idx_shift}/{len(self.gacha_boxes)+self.idx_shift}")
                 run_stage('crack', lambda: CrackCrystalsTask(
                     self.bot_state,
                     self.player_input,
@@ -812,14 +813,12 @@ class CollectAndCrackAllGachasTask(BaseTask):
                 ).run())
 
             # Sort loot and grind resources produced
-            info(f"Sorting box {idx+1}/{len(self.gacha_boxes)}")
+            info(f"Sorting box {idx+1+self.idx_shift}/{len(self.gacha_boxes)+self.idx_shift}")
             run_stage('sort', lambda: SortLootAndGrindTask(
                 self.bot_state,
                 self.player_input,
                 self.inventory_manager
             ).run())
-
-            
 
             # Completed box; advance checkpoint to next and clear stage
             self.bot_state.collect_checkpoint_idx = idx + 1
@@ -866,11 +865,12 @@ class FeedAllGachasMajorTask(BaseTask):
         'gacha2_view_direction': <dir>
       }
     """
-    def __init__(self, bot_state: BotState, player_input: PlayerInput, inventory_manager: InventoryManager, gacha_sets=None):
+    def __init__(self, bot_state: BotState, player_input: PlayerInput, inventory_manager: InventoryManager, gacha_sets=None, overlay_callback=None):
         self.bot_state = bot_state
         self.player_input = player_input
         self.inventory_manager = inventory_manager
         self.gacha_sets = gacha_sets
+        self.overlay_callback = overlay_callback
 
     def run(self):
         import os, json
@@ -905,6 +905,8 @@ class FeedAllGachasMajorTask(BaseTask):
         stages = ('gettraps', 'feed_gacha1', 'feed_gacha2')
 
         for idx, box in enumerate(sets):
+            if self.overlay_callback:
+                self.overlay_callback(f"Feeding box {idx+1}/{len(sets)}")
             # For the first box after recovery, use the checkpointed stage; for all others, start from the beginning
             this_box_stage = start_stage if idx == start_idx else None
             if idx < start_idx:
