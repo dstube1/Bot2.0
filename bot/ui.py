@@ -82,6 +82,11 @@ class BotUI:
 				label.pack(anchor='nw', fill='both', expand=True)
 				def overlay_callback(text):
 					label.config(text=text)
+					overlay.update_idletasks()
+					# Always position at bottom left
+					screen_height = overlay.winfo_screenheight()
+					overlay_height = overlay.winfo_height()
+					overlay.geometry(f'+0+{screen_height - overlay_height}')
 				overlay_callback('Bot started...')
 			run_bot(selected, cycles, ui_callback, overlay_callback)
 		except Exception as e:
