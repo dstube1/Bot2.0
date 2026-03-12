@@ -2,7 +2,7 @@ import time
 from base import BotState, PlayerInput, InventoryManager
 from tasks import CollectAndCrackAllGachasTask, FeedAllGachasMajorTask
 
-def run_bot(selected, cycles=20, ui_callback=None, overlay_callback=None):
+def run_bot(selected, cycles=20, ui_callback=None, overlay_callback=None, start_with_crack=False):
     # F1 abort logic
     import threading
     try:
@@ -138,7 +138,9 @@ def run_bot(selected, cycles=20, ui_callback=None, overlay_callback=None):
             break
         print(f"=== Split Bot Cycle {cycle}{f'/{cycles}' if cycles != 0 else ''} ===")
 
-        if 'feed' in selected:
+        skip_feed = start_with_crack and cycle == 1
+
+        if 'feed' in selected and not skip_feed:
             print("=== FeedAllGachasMajorTask (all boxes) ===")
             bot_state.major_checkpoint_idx = 0
             bot_state.major_checkpoint_stage = None
@@ -175,7 +177,7 @@ def run_bot(selected, cycles=20, ui_callback=None, overlay_callback=None):
             print("Abort signal received. Exiting bot loop.")
             break
 
-        if 'feed' in selected:
+        if 'feed' in selected and not skip_feed:
             print("=== FeedAllGachasMajorTask (all boxes, between cracks) ===")
             bot_state.major_checkpoint_idx = 0
             bot_state.major_checkpoint_stage = None

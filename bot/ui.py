@@ -23,12 +23,14 @@ class BotUI:
 		# Task selections
 		self.feed_var = tk.BooleanVar(value=False)
 		self.crack_var = tk.BooleanVar(value=False)
+		self.start_with_crack_var = tk.BooleanVar(value=False)
 		self.cycles_var = tk.StringVar(value="20")
 		self.overlay_var = tk.BooleanVar(value=True)
 
 		ttk.Label(master, text="Select tasks:").grid(row=0, column=0, sticky="w", padx=10, pady=(10, 0))
 		ttk.Checkbutton(master, text="Feed Gachas", variable=self.feed_var).grid(row=1, column=0, sticky="w", padx=20)
 		ttk.Checkbutton(master, text="Crack Crystals", variable=self.crack_var).grid(row=2, column=0, sticky="w", padx=20)
+		ttk.Checkbutton(master, text="Start with Crack", variable=self.start_with_crack_var).grid(row=2, column=1, sticky="w", padx=10)
 
 		ttk.Label(master, text="Cycles (0 = infinite):").grid(row=3, column=0, sticky="w", padx=10, pady=(10, 0))
 		self.cycles_entry = ttk.Entry(master, textvariable=self.cycles_var, width=8)
@@ -60,9 +62,10 @@ class BotUI:
 			return
 
 		show_overlay = self.overlay_var.get()
-		threading.Thread(target=self._run_tasks, args=(selected, cycles, show_overlay), daemon=True).start()
+		start_with_crack = self.start_with_crack_var.get()
+		threading.Thread(target=self._run_tasks, args=(selected, cycles, show_overlay, start_with_crack), daemon=True).start()
 
-	def _run_tasks(self, selected, cycles=20, show_overlay=True):
+	def _run_tasks(self, selected, cycles=20, show_overlay=True, start_with_crack=False):
 		try:
 			def ui_callback(kind, msg):
 				if kind == 'error':
@@ -88,7 +91,7 @@ class BotUI:
 					overlay_height = overlay.winfo_height()
 					overlay.geometry(f'+0+{screen_height - overlay_height}')
 				overlay_callback('Bot started...')
-			run_bot(selected, cycles, ui_callback, overlay_callback)
+			run_bot(selected, cycles, ui_callback, overlay_callback, start_with_crack=start_with_crack)
 		except Exception as e:
 			self.master.after(0, lambda: messagebox.showerror("Error", f"Failed to run tasks: {e}"))
 
