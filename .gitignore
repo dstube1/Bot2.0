@@ -10,3 +10,4 @@ todo.txt
 # Ignore config folder and all JSON files inside
 config/
 config/*.json
+/.vscode/settings.json
