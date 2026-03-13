@@ -241,25 +241,6 @@ class PlayerInput:
         except Exception as e:
             error(f"Error loading scan_text.json: {e}")
 
-        # Load teleporter destinations
-        tp_cfg_path = os.path.join(os.path.dirname(__file__), '../config/teleporter.json')
-        try:
-            with open(tp_cfg_path, 'r') as f:
-                data = json.load(f)
-            items = data.get('teleporters', [])
-            # Map name -> entry for quick lookup
-            self.teleporters = { it.get('name'): it for it in items if it.get('name') }
-            # Convenience: default bed destination
-            self.teleporter_render = next((name for name, it in self.teleporters.items() if name == 'render' and it.get('enabled', True)), None)
-            if not self.teleporter_render:
-                # Fallback to first enabled teleporter
-                enabled = [name for name, it in self.teleporters.items() if it.get('enabled', True)]
-                self.teleporter_render = enabled[0] if enabled else 'render'
-        except Exception as e:
-            error(f"Error loading teleporter.json: {e}")
-            self.teleporters = {}
-            self.teleporter_render = 'render'
-
     # ---- Config helpers ----
     def load_json(self, filename: str) -> dict:
         """Load a JSON file from the config folder and return its dict (empty on failure)."""
@@ -548,10 +529,10 @@ class PlayerInput:
         """
         return f"({pos[0]}, {pos[1]})"
 
-    def calibrate_current_view(self, bot_state: BotState, wait_seconds: float = 0.5) -> Optional[Tuple[float, float]]:
+    def calibrate_current_view(self, bot_state: BotState, wait_seconds: float = 0.5, calibration_run = False) -> Optional[Tuple[float, float]]:
         """
         Trigger 'ccc' in-game, read clipboard, and save yaw/pitch to bot_state.view_direction.
-        Mirrors the logic used in calibration.calibrator.
+        Also, parse x,y,z and update teleporter.json if new, and check which teleporter is closest (within 5 units).
 
         Args:
             bot_state: BotState instance to update.
@@ -561,6 +542,7 @@ class PlayerInput:
             (yaw, pitch) on success, otherwise None.
         """
         try:
+            import math
             time.sleep(1)
             pyautogui.press('tab')
             pyautogui.typewrite('ccc')
@@ -571,16 +553,51 @@ class PlayerInput:
                 error("calibrate_current_view: clipboard is empty after 'ccc'")
                 return None
             parts = clipboard_data.strip().split()
-            if len(parts) < 3:
+            if len(parts) < 5:
                 error(f"calibrate_current_view: unexpected clipboard format: {clipboard_data}")
                 return None
-            pos_str, yaw_str, pitch_str = parts[-3], parts[-2], parts[-1]
-            # pos is not applied to state here, only view
+            # Expecting ... x y z yaw pitch
+            x_str, y_str, z_str, yaw_str, pitch_str = parts[-5], parts[-4], parts[-3], parts[-2], parts[-1]
+            x, y, z = float(x_str), float(y_str), float(z_str)
             yaw = float(yaw_str)
             pitch = float(pitch_str)
             bot_state.view_direction = (yaw, pitch)
             debug(f"Calibrated view saved: yaw={yaw}, pitch={pitch}")
-            return (yaw, pitch)
+
+            # Load teleporter.json
+            tp_cfg_path = os.path.join(os.path.dirname(__file__), '../config/teleporter.json')
+            try:
+                with open(tp_cfg_path, 'r') as f:
+                    tp_data = json.load(f)
+            except Exception:
+                tp_data = {}
+            teleporters = tp_data.get('teleporters', [])
+
+            # Check if current x,y,z is already in teleporters (within 5 units)
+            found_tp = None
+            for tp in teleporters:
+                tp_coords = tp.get('position')
+                if tp_coords and len(tp_coords) == 3:
+                    dist = math.sqrt((x-tp_coords[0])**2 + (y-tp_coords[1])**2 + (z-tp_coords[2])**2)
+                    if dist <= 5:
+                        found_tp = tp
+                        break
+
+            if found_tp:
+                debug(f"Current location matches teleporter: {found_tp.get('name','<unnamed>')}")
+                # Update bot_state.position to the teleporter name
+                if 'name' in found_tp:
+                    bot_state.position = found_tp['name']
+            else:
+                if not calibration_run:
+                    # Not found, prompt to add new teleporter
+                    time.sleep(5)
+                    error(f"Current location (x={x}, y={y}, z={z}) does not match any known teleporter. Please add it to teleporter.json and restart the bot.")
+                    os._exit()
+                else:
+                    warn(f"calibrate_current_view: current location (x={x}, y={y}, z={z}) not in teleporter.json, but calibration_run=True so not exiting.")
+
+            return (yaw, pitch, x, y, z)
         except Exception as e:
             error(f"calibrate_current_view: failed to parse clipboard: {e}")
             return None
@@ -630,7 +647,8 @@ class PlayerInput:
         # Dummy: Simulate console command
 
     def go_to_bed(self, bot_state: BotState) -> bool:
-        """Use the teleporter to port to the bed defined in teleporter.json."""
+        """Use the teleporter to port to the bed defined in teleporter.json.
+        DEPRECIATED: Teleporter is no longer read from teleporter.json"""
         try:
             # Use preloaded teleporter destination
             dest_name = self.teleporter_render or 'render'
