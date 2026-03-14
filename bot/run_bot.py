@@ -2,7 +2,7 @@ import time
 from base import BotState, PlayerInput, InventoryManager
 from tasks import CollectAndCrackAllGachasTask, FeedAllGachasMajorTask
 
-def run_bot(selected, cycles=20, ui_callback=None, overlay_callback=None, start_with_crack=False):
+def run_bot(selected, cycles=20, ui_callback=None, overlay_callback=None, start_with_crack=False, eat_twice=False):
     # F1 abort logic
     import threading
     try:
@@ -41,15 +41,21 @@ def run_bot(selected, cycles=20, ui_callback=None, overlay_callback=None, start_
         finally:
             inv.close_inv()
 
-    def feed_player():
+    def feed_player(eat_2_times=False):
         try:
             import pyautogui
         except ImportError:
             return
-        pyautogui.press('2')
-        time.sleep(0.5)
-        pyautogui.press('3')
-        time.sleep(0.5)
+        if eat_2_times:
+            pyautogui.press('4')
+            time.sleep(0.5)
+            pyautogui.press('5')
+            time.sleep(0.5)
+        else:
+            pyautogui.press('2')
+            time.sleep(0.5)
+            pyautogui.press('3')
+            time.sleep(0.5)
 
     def run_with_retries(task, max_attempts=5, warn_prefix=None, overlay_text=None):
         attempt = 0
@@ -172,6 +178,8 @@ def run_bot(selected, cycles=20, ui_callback=None, overlay_callback=None, start_
                 print("No boxes 1-6 found for collect and crack.")
 
         drop_all(inventory)
+        feed_player(eat_2_times=eat_twice)
+
 
         if stop_event.is_set():
             print("Abort signal received. Exiting bot loop.")

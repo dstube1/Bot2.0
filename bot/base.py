@@ -579,7 +579,7 @@ class PlayerInput:
                 tp_coords = tp.get('position')
                 if tp_coords and len(tp_coords) == 3:
                     dist = math.sqrt((x-tp_coords[0])**2 + (y-tp_coords[1])**2 + (z-tp_coords[2])**2)
-                    if dist <= 5:
+                    if dist <= 50:
                         found_tp = tp
                         break
 
@@ -698,7 +698,7 @@ class InventoryManager:
     """Handles opening, closing, and interacting with inventories."""
     def grinder_slots(self, region: tuple[int, int, int, int], limit: int) -> bool:
         """
-        Check if the grinder slots exceed the given limit by detecting the text 'xxx / 120' or 'xxx \ 120'.
+        Check if the grinder slots exceed the given limit by detecting the text 'xxx / 120'.
 
         Args:
             region (tuple): The region (x1, y1, x2, y2) to capture.
