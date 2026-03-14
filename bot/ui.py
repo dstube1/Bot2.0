@@ -21,8 +21,8 @@ class BotUI:
 		self.master.title("ARK Gacha Bot 2.0")
 
 		# Task selections
-		self.feed_var = tk.BooleanVar(value=False)
-		self.crack_var = tk.BooleanVar(value=False)
+		self.feed_var = tk.BooleanVar(value=True)
+		self.crack_var = tk.BooleanVar(value=True)
 		self.start_with_crack_var = tk.BooleanVar(value=False)
 		self.cycles_var = tk.StringVar(value="20")
 		self.overlay_var = tk.BooleanVar(value=True)
