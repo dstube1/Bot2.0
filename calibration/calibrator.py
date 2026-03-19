@@ -161,6 +161,8 @@ class CalibratorUI:
 		self.calibration_mode = None
 		self.label = ttk.Label(master, text="Select calibration type:")
 		self.label.pack(pady=10)
+		self.mouse_calib_btn = ttk.Button(master, text="Mouse Calibration", command=self.run_mouse_calibration)
+		self.mouse_calib_btn.pack(pady=5)
 		self.look_btn = ttk.Button(master, text="Look Calibration", command=lambda: self.start_calibration('look'))
 		self.look_btn.pack(pady=5)
 		self.click_btn = ttk.Button(master, text="Click Calibration", command=lambda: self.start_calibration('click'))
@@ -175,6 +177,20 @@ class CalibratorUI:
 		self.empty_grinder_btn.pack(pady=5)
 		self.status = ttk.Label(master, text="")
 		self.status.pack(pady=5)
+		# Mouse Calibration button
+		
+	def run_mouse_calibration(self):
+		import subprocess, sys
+		cal_path = os.path.join(os.path.dirname(__file__), "mouse_calibration.py")
+		cal_path = os.path.abspath(cal_path)
+		if not os.path.exists(cal_path):
+			messagebox.showerror("Not Found", "Mouse calibration script not found.")
+			return
+		try:
+			subprocess.Popen([sys.executable, cal_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+			messagebox.showinfo("Mouse Calibration", "Mouse calibration started in a separate process.")
+		except Exception as e:
+			messagebox.showerror("Error", f"Failed to start mouse calibration: {e}")
 		crop_plot_targets = [
 			{"name": f"crop_plot_{i}", "desc": f"Look at Crop Plot {i} and press Calibrate"}
 			for i in range(1, 25)

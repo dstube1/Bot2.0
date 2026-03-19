@@ -3,14 +3,11 @@ import ctypes
 import pyperclip
 import keyboard  # To detect key presses
 from pynput.keyboard import Key, Controller
-import configparser
 
+import json
+import os
 
 keyboard_controller = Controller()
-
-# Load configuration
-config = configparser.ConfigParser()
-config.read("config.ini")
 
 
 def move_mouse_relative(dx: int, dy: int) -> None:
@@ -126,21 +123,37 @@ def test_mouse_movement(dx: int, dy: int):
 
     return round(yaw_sensitivity, 5), round(-pitch_sensitivity, 5)
 
+
 def save_config(sensitivity):
     yaw_sensitivity, pitch_sensitivity = sensitivity  # Unpack the tuple
 
-    if 'CCC_CONVERSION' not in config.sections():
-        config.add_section('CCC_CONVERSION')
-    
-    # Format as "yaw,pitch"
-    sensitivity_str = f"{yaw_sensitivity},{pitch_sensitivity}"
-    
-    config.set('CCC_CONVERSION', 'conversion', sensitivity_str)
-    
-    with open('config.ini', 'w') as configfile:
-        config.write(configfile)
-    
-    print("Saved CCC_CONVERSION to config.ini")
+    config_path = os.path.join(os.path.dirname(__file__), '..', 'config', 'config.json')
+    config_path = os.path.abspath(config_path)
+
+    # Load existing config if it exists
+    if os.path.exists(config_path):
+        with open(config_path, 'r') as f:
+            try:
+                config_data = json.load(f)
+            except Exception:
+                config_data = {}
+    else:
+        config_data = {}
+
+    # Update degree_to_pixel_factor
+    config_data['degree_to_pixel_factor'] = {
+        'x': yaw_sensitivity,
+        'y': pitch_sensitivity
+    }
+
+    # Preserve Logging if present, else default to INFO
+    if 'Logging' not in config_data:
+        config_data['Logging'] = 'INFO'
+
+    with open(config_path, 'w') as f:
+        json.dump(config_data, f, indent=2)
+
+    print(f"Saved degree_to_pixel_factor to {config_path}")
 
 
 

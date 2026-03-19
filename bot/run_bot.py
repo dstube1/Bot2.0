@@ -11,6 +11,19 @@ def run_bot(selected, cycles=20, ui_callback=None, overlay_callback=None, start_
     except Exception:
         KEYBOARD_AVAILABLE = False
 
+    # Monitor turn-off logic (F3 hotkey)
+    try:
+        import ctypes
+        def turn_off_monitors():
+            HWND_BROADCAST = 0xFFFF
+            WM_SYSCOMMAND = 0x0112
+            SC_MONITORPOWER = 0xF170
+            ctypes.windll.user32.SendMessageW(HWND_BROADCAST, WM_SYSCOMMAND, SC_MONITORPOWER, 2)
+        if KEYBOARD_AVAILABLE:
+            keyboard.add_hotkey('F3', turn_off_monitors)
+    except Exception:
+        pass
+    
     stop_event = threading.Event()
     def watcher_stop_event(stop_event):
         if not KEYBOARD_AVAILABLE:

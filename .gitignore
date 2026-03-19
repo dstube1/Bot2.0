@@ -9,5 +9,6 @@ assets/grinder_slot_tmp.png
 todo.txt
 # Ignore config folder and all JSON files inside
 config/
+config_bak/
 config/*.json
 /.vscode/settings.json
