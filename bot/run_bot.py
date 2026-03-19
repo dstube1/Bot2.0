@@ -178,7 +178,8 @@ def run_bot(selected, cycles=20, ui_callback=None, overlay_callback=None, start_
                 print("No boxes 1-6 found for collect and crack.")
 
         drop_all(inventory)
-        feed_player(eat_2_times=eat_twice)
+        if eat_twice:
+            feed_player(eat_2_times=eat_twice)
 
 
         if stop_event.is_set():

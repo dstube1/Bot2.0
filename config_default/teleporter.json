@@ -1,14 +1,184 @@
 {
-	"teleporters": [
-		{
-			"name": "gucci land",
-			"description": "Bed teleporter destination",
-			"enabled": true
-		},
-        {
-            "name": "grinder",
-            "description": "Teleporter to grinder area",
-            "enabled": true
-		}
-	]
+  "teleporters": [
+    {
+      "name": "trap_farm",
+      "description": "Bed teleporter destination",
+      "enabled": true,
+      "position": [
+        -115790.0,
+        166477.0,
+        -3134.0
+      ]
+    },
+    {
+      "name": "grinder",
+      "description": "Teleporter to grinder area",
+      "enabled": true,
+      "position": [
+        -116795.0,
+        171618.0,
+        -6734.0
+      ]
+    },
+    {
+      "name": "plots1",
+      "description": "Bed teleporter destination",
+      "enabled": true,
+      "position": [
+        -115312.0,
+        165507.0,
+        -3134.0
+      ]
+    },
+    {
+      "name": "plots2",
+      "description": "Bed teleporter destination",
+      "enabled": true,
+      "position": [
+        -116205.0,
+        165624.0,
+        -3134.0
+      ]
+    },
+    {
+      "name": "plots3",
+      "description": "Bed teleporter destination",
+      "enabled": true,
+      "position": [
+        -115971.0,
+        167409.0,
+        -3134.0
+      ]
+    },
+    {
+      "name": "plots4",
+      "description": "Bed teleporter destination",
+      "enabled": true,
+      "position": [
+        -115078.0,
+        167292.0,
+        -3134.0
+      ]
+    },
+    {
+      "name": "box1x",
+      "description": "Box1 teleporter destination",
+      "enabled": true,
+      "position": [
+        -120392.0,
+        172068.0,
+        -6734.0
+      ]
+    },
+    {
+      "name": "box2",
+      "description": "Box2 teleporter destination",
+      "enabled": true,
+      "position": [
+        -113797.0,
+        171161.0,
+        -6734.0
+      ]
+    },
+    {
+      "name": "box3",
+      "description": "Box3 teleporter destination",
+      "enabled": true,
+      "position": [
+        -114233.0,
+        167974.0,
+        -6734.0
+      ]
+    },
+    {
+      "name": "box4",
+      "description": "Box4 teleporter destination",
+      "enabled": true,
+      "position": [
+        -114676.0,
+        164690.0,
+        -6734.0
+      ]
+    },
+    {
+      "name": "box5",
+      "description": "Box5 teleporter destination",
+      "enabled": true,
+      "position": [
+        -115074.0,
+        161372.0,
+        -6734.0
+      ]
+    },
+    {
+      "name": "box6",
+      "description": "Box6 teleporter destination",
+      "enabled": true,
+      "position": [
+        -121619.0,
+        162270.0,
+        -6734.0
+      ]
+    },
+    {
+      "name": "box7",
+      "description": "Box7 teleporter destination",
+      "enabled": true,
+      "position": [
+        -121642.0,
+        162209.0,
+        -3134.0
+      ]
+    },
+    {
+      "name": "box8",
+      "description": "Box8 teleporter destination",
+      "enabled": true,
+      "position": [
+        -115087.0,
+        161376.0,
+        -3134.0
+      ]
+    },
+    {
+      "name": "box9",
+      "description": "Box9 teleporter destination",
+      "enabled": true,
+      "position": [
+        -114637.0,
+        164672.0,
+        -3134.0
+      ]
+    },
+    {
+      "name": "box10",
+      "description": "Box10 teleporter destination",
+      "enabled": true,
+      "position": [
+        -114223.0,
+        167958.0,
+        -3134.0
+      ]
+    },
+    {
+      "name": "box11",
+      "description": "Box11 teleporter destination",
+      "enabled": true,
+      "position": [
+        -113850.0,
+        171203.0,
+        -3134.0
+      ]
+    },
+    {
+      "name": "box12",
+      "description": "Box12 teleporter destination",
+      "enabled": true,
+      "position": [
+        -120374.0,
+        172094.0,
+        -3134.0
+      ]
+    }
+  ]
 }

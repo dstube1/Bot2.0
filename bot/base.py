@@ -158,6 +158,9 @@ class PlayerInput:
             self.first_slot_own     = tuple(find_inv("first_slot_own")["position"]) if find_inv("first_slot_own") else None
             # Optional: small mouse nudge used during crystal checks
             self.nudge_mouse        = tuple(find_inv("nudge_mouse")["position"]) if find_inv("nudge_mouse") else None
+            # Added: tp_back_button and close_inv from click_positions.json
+            self.tp_back_button     = tuple(find_inv("tp_back_button")["position"]) if find_inv("tp_back_button") else None
+            self.close_inv         = tuple(find_inv("close_inv")["position"]) if find_inv("close_inv") else None
             # Optional scan region for drop_item: prefer scan_windows entry, else fallback to drop_all scan
             # Note: region is not a click position; wired below after scan_windows load.
             self.drop_item_scan = None
@@ -1230,17 +1233,26 @@ class Recovery:
         # Only close inventory if open
         own_inv_open = self._text_present(pi.own_inv_scan, pi.inv_text)
         tp_inv_open  = self._text_present(pi.tp_inv_scan, pi.tp_inv_text)
+        import pyautogui
         if own_inv_open or tp_inv_open:
-            debug("Recovery: Inventory detected open; pressing ESC to close.")
-            pyautogui.press('esc')
-            time.sleep(0.2)
-            # Optionally recheck and press again if still open
+            debug("Recovery: Inventory detected open; attempting to close with UI buttons.")
+            if tp_inv_open and getattr(pi, 'tp_back_button', None):
+                pyautogui.click(pi.tp_back_button)
+                time.sleep(0.2)
+            if own_inv_open and getattr(pi, 'close_inv', None):
+                pyautogui.click(pi.close_inv)
+                time.sleep(0.2)
+            # Optionally recheck and try again if still open
             own_inv_open = self._text_present(pi.own_inv_scan, pi.inv_text)
             tp_inv_open  = self._text_present(pi.tp_inv_scan, pi.tp_inv_text)
             if own_inv_open or tp_inv_open:
-                debug("Recovery: Inventory still open after ESC; pressing ESC again.")
-                pyautogui.press('esc')
-                time.sleep(0.2)
+                debug("Recovery: Inventory still open after UI button; retrying.")
+                if tp_inv_open and getattr(pi, 'tp_back_button', None):
+                    pyautogui.click(pi.tp_back_button)
+                    time.sleep(0.2)
+                if own_inv_open and getattr(pi, 'close_inv', None):
+                    pyautogui.click(pi.close_inv)
+                    time.sleep(0.2)
 
         # Calibrate view
         try:
