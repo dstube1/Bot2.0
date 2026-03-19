@@ -98,6 +98,16 @@ class PlayerInput:
     def __init__(self):
         self.ocr = OCR()
         self.recovery = Recovery(self)
+        # Load custom keybinds
+        self.keybinds = {"console": "tab", "inventory": "i"}
+        custom_keybind_path = os.path.join(os.path.dirname(__file__), '../config/custom_keybind.json')
+        try:
+            with open(custom_keybind_path, 'r') as f:
+                kb = json.load(f)
+                if isinstance(kb, dict):
+                    self.keybinds.update({k: v for k, v in kb.items() if isinstance(v, str) and k in self.keybinds})
+        except Exception:
+            pass
         # Load global config values
         config_path = os.path.join(os.path.dirname(__file__), '../config/config.json')
         try:
@@ -496,6 +506,14 @@ class PlayerInput:
         """
         pyautogui.press(key)
 
+    def press_inventory(self):
+        """Press the inventory key (customizable)."""
+        pyautogui.press(self.keybinds.get("inventory", "i"))
+
+    def press_console(self):
+        """Press the console key (customizable)."""
+        pyautogui.press(self.keybinds.get("console", "tab"))
+
     def log_task(self, bot_state: BotState, task_name: str, task_obj=None):
         """Record current task name and optionally its object in bot_state (in-memory)."""
         bot_state.current_task = task_name
@@ -547,7 +565,7 @@ class PlayerInput:
         try:
             import math
             time.sleep(1)
-            pyautogui.press('tab')
+            self.press_console()
             pyautogui.typewrite('ccc')
             pyautogui.press('enter')
             time.sleep(wait_seconds)
@@ -804,7 +822,7 @@ class InventoryManager:
         if hasattr(self, 'bot_state') and self.bot_state and self.bot_state.inventory_open and self.bot_state.inventory_type == 'own':
             debug("open_own_inv: own inventory already open; skipping 'i'.")
             return True
-        self.input.press_key('i')
+        self.input.press_inventory()
         state, read = self.ocr.wait_for_text(self.input.own_inv_scan, self.input.inv_text, False, bot_state=self.bot_state if hasattr(self,'bot_state') else None, recovery=self.input.recovery)
         if state is True:
             self._set_inv_state(True, 'own')
