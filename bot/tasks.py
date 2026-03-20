@@ -225,7 +225,17 @@ class CrackCrystalsTask(BaseTask):
             return bool(self.player_input.crystal_left(getattr(inp, 'first_slot_own_scan', None), confidence=0.4))
         # Movement parameters
         CYCLES = 2           # number of left-right cycles before re-checking
-        SMOOTH_PIX = 540       # pixels per smooth move
+ 
+        def get_smooth_pix():
+            cfg_path = os.path.join(os.path.dirname(__file__), "..", "config", "config.json")
+            try:
+                with open(cfg_path, "r") as f:
+                    data = json.load(f)
+                return int(data.get("Crack_PIX", 540))
+            except Exception:
+                return 540
+        SMOOTH_PIX = get_smooth_pix()
+
         # Repeat cycles, then re-check if crystals remain; stop when none left
         while True:
             for _ in range(CYCLES):
