@@ -3,5 +3,6 @@
     "x":  0.17498,
     "y": -0.17498
   },
-  "Logging": "INFO"
+  "Logging": "INFO",
+  "Crack_PIX": 540
 }
