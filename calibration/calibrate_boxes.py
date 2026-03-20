@@ -1,18 +1,71 @@
 
+import sys
 import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import json
 import time
-import keyboard
+from PyQt5.QtWidgets import QApplication, QWidget
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QPainter, QColor, QFont
+import pyautogui
+try:
+    import mouse
+    mouse_installed = True
+except ImportError:
+    mouse_installed = False
 from bot.base import BotState, PlayerInput
 
-def prompt_user(message):
-    print(f"{message} Press 'p' to confirm...")
-    while True:
-        if keyboard.is_pressed('p'):
-            # Wait for key release to avoid double triggers
-            while keyboard.is_pressed('p'):
-                time.sleep(0.05)
-            break
+
+import threading
+import keyboard
+
+
+def prompt_user_overlay_f3(message, overlay):
+    overlay.set_instruction(message)
+    overlay.show()
+    confirmed = {'pressed': False}
+    def on_f3():
+        confirmed['pressed'] = True
+        overlay.set_instruction("")
+    keyboard.add_hotkey('f3', on_f3)
+    app = QApplication.instance()
+    while not confirmed['pressed']:
+        app.processEvents()
+        time.sleep(0.05)
+
+
+class CalibrationOverlay(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
+        self.setAttribute(Qt.WA_TranslucentBackground)
+        self.setAttribute(Qt.WA_NoSystemBackground, True)
+        self.setGeometry(self.screenGeometry())
+        self.instruction = ""
+        self.showFullScreen()
+
+    def set_instruction(self, text):
+        self.instruction = text
+        self.update()
+
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.Antialiasing)
+        painter.fillRect(self.rect(), QColor(0, 0, 0, 0))
+        if self.instruction:
+            painter.setPen(QColor(255,255,255))
+            painter.setFont(QFont('Arial', 32, QFont.Bold))
+            painter.drawText(self.rect(), Qt.AlignTop | Qt.AlignHCenter, self.instruction)
+
+    def screenGeometry(self):
+        from PyQt5.QtGui import QGuiApplication
+        screens = QGuiApplication.screens()
+        if not screens:
+            return QApplication.primaryScreen().geometry()
+        rect = screens[0].geometry()
+        for screen in screens[1:]:
+            rect = rect.united(screen.geometry())
+        return rect
 
 def calibrate_boxes():
     # Load gacha sets
@@ -24,43 +77,49 @@ def calibrate_boxes():
     # Prepare bot state and input
     bot_state = BotState()
     player_input = PlayerInput()
-    time.sleep(4)  # Give user time to switch to Game
+
+    app = QApplication([])
+    overlay = CalibrationOverlay()
+    overlay.set_instruction("")
+    overlay.show()
+
+    # Initial prompt for user to stand on teleporter
+    prompt_user_overlay_f3("Stand on teleporter and press F3 to start", overlay)
 
     # Only calibrate boxes 7 to 12 (indices 6 to 11)
-    for idx in range(6, 12):
+    for idx in range(0, 12):
         if idx >= len(sets):
-            print(f"Box index {idx+1} does not exist in gacha_sets.json.")
+            overlay.set_instruction(f"Error: Box index {idx+1} does not exist in gacha_sets.json.")
+            app.processEvents()
+            time.sleep(2)
             continue
         box = sets[idx]
         box_name = box.get("name", f"box_{idx+1}")
         tp_box = box.get("tp_box")
-        print(f"\nTeleporting to {box_name} ({tp_box})...")
+        prompt_user_overlay_f3(f"Press F3 to teleport to {box_name} ({tp_box})...", overlay)
         player_input.teleport_to(tp_box, bot_state)
         time.sleep(1)
 
         # Calibrate Gacha 1
-        prompt_user(f"Look at Gacha 1 for {box_name}.")
+        prompt_user_overlay_f3(f"Look at Gacha 1 for {box_name}, then press F3 to capture.", overlay)
         x1, y1, z1, yaw1, pitch1 = parse_ccc_clipboard(player_input)
-        print(f"Gacha 1: x={x1}, y={y1}, z={z1}, yaw={yaw1}, pitch={pitch1}")
         box["gacha1_view_direction"] = {"yaw": yaw1, "pitch": pitch1, "x": x1, "y": y1, "z": z1}
 
         # Calibrate Gacha 2
-        prompt_user(f"Look at Gacha 2 for {box_name}.")
+        prompt_user_overlay_f3(f"Look at Gacha 2 for {box_name}, then press F3 to capture.", overlay)
         x2, y2, z2, yaw2, pitch2 = parse_ccc_clipboard(player_input)
-        print(f"Gacha 2: x={x2}, y={y2}, z={z2}, yaw={yaw2}, pitch={pitch2}")
         box["gacha2_view_direction"] = {"yaw": yaw2, "pitch": pitch2, "x": x2, "y": y2, "z": z2}
 
         # Calibrate Pego
-        prompt_user(f"Look at Pego for {box_name}.")
+        prompt_user_overlay_f3(f"Look at Pego for {box_name}, then press F3 to capture.", overlay)
         xp, yp, zp, yawp, pitchp = parse_ccc_clipboard(player_input)
-        print(f"Pego: x={xp}, y={yp}, z={zp}, yaw={yawp}, pitch={pitchp}")
         box["pego_view_direction"] = {"yaw": yawp, "pitch": pitchp, "x": xp, "y": yp, "z": zp}
 
-    # Save updated config
-    data["gacha_sets"] = sets
-    with open(cfg_path, "w") as f:
-        json.dump(data, f, indent=2)
-    print("Calibration complete. Updated gacha_sets.json.")
+    overlay.set_instruction("Calibration complete. Updated gacha_sets.json.\nYou may close this window.")
+    app.processEvents()
+    time.sleep(2)
+    overlay.close()
+    app.quit()
 
 
 import pyperclip

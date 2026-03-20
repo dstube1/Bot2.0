@@ -1,11 +1,15 @@
+
 import time
 import ctypes
 import pyperclip
 import keyboard  # To detect key presses
 from pynput.keyboard import Key, Controller
-
 import json
 import os
+import threading
+from PyQt5.QtWidgets import QApplication, QWidget
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QPainter, QColor, QFont
 
 keyboard_controller = Controller()
 
@@ -157,23 +161,81 @@ def save_config(sensitivity):
 
 
 
+
+class CalibrationOverlay(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
+        self.setAttribute(Qt.WA_TranslucentBackground)
+        self.setAttribute(Qt.WA_NoSystemBackground, True)
+        self.setAttribute(Qt.WA_TransparentForMouseEvents, False)
+        self.setMouseTracking(True)
+        self.setGeometry(self.screenGeometry())
+        self.instruction = ""
+        self.showFullScreen()
+
+    def set_instruction(self, text):
+        self.instruction = text
+        self.update()
+
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.Antialiasing)
+        # Fully transparent background
+        painter.fillRect(self.rect(), QColor(0, 0, 0, 0))
+        if self.instruction:
+            painter.setPen(QColor(255,255,255))
+            painter.setFont(QFont('Arial', 32, QFont.Bold))
+            painter.drawText(self.rect(), Qt.AlignTop | Qt.AlignHCenter, self.instruction)
+
+    def screenGeometry(self):
+        # Get the bounding rectangle of all screens
+        from PyQt5.QtGui import QGuiApplication
+        screens = QGuiApplication.screens()
+        if not screens:
+            return QApplication.primaryScreen().geometry()
+        rect = screens[0].geometry()
+        for screen in screens[1:]:
+            rect = rect.united(screen.geometry())
+        return rect
+
 def main():
     dx = 500 # Horizontal mouse movement in pixels
     dy = 500  # Vertical mouse movement in pixels (negative to move up)
 
-    print("Press 'P' to perform the test. Press 'Esc' to exit.")
-    while True:
-        if keyboard.is_pressed('p'):
-            test_mouse_movement(dx, dy)
-            sensitivity = test_mouse_movement(-dx, -dy)
-            save_config(sensitivity)
-            time.sleep(1)  # Prevent accidental double triggering due to key holding
-        
-        if keyboard.is_pressed('esc'):
-            print("Exiting the program.")
-            break
+    app = QApplication([])
+    overlay = CalibrationOverlay()
+    overlay.set_instruction("Prepare for mouse calibration and press F3 to start")
+    overlay.show()
+
+    confirmed = {'pressed': False}
+    def on_f3():
+        confirmed['pressed'] = True
+        overlay.set_instruction("")
+    keyboard.add_hotkey('f3', on_f3)
+    # Wait for F3
+    while not confirmed['pressed']:
+        app.processEvents()
+        time.sleep(0.05)
+
+    # Run calibration sequence once after F3
+    overlay.set_instruction("Calibrating: moving mouse +dx, +dy...")
+    app.processEvents()
+    test_mouse_movement(dx, dy)
+    overlay.set_instruction("Calibrating: moving mouse -dx, -dy...")
+    app.processEvents()
+    sensitivity = test_mouse_movement(-dx, -dy)
+    overlay.set_instruction("Saving calibration results...")
+    app.processEvents()
+    save_config(sensitivity)
+    time.sleep(1)
+    overlay.set_instruction("Calibration complete. You may close this window.")
+    app.processEvents()
+    time.sleep(2)
+    overlay.close()
+    app.quit()
 
 # Run the main loop
-main()
+if __name__ == "__main__":
+    main()
 
-###! ADD TO CONFIG.JSON ###

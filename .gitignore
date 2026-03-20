@@ -12,3 +12,5 @@ config/
 config_bak/
 config/*.json
 /.vscode/settings.json
+tests/
+tests/*.py

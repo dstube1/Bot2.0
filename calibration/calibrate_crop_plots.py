@@ -1,11 +1,66 @@
+
 #USAGE: python -m utils.calibrate_crop_plots
+import sys
 import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import json
 import time
+import threading
 import keyboard
+from PyQt5.QtWidgets import QApplication, QWidget
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QPainter, QColor, QFont
 import pyautogui
 import pyperclip
 from bot.base import BotState, PlayerInput
+
+
+class CalibrationOverlay(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowFlags(Qt.WindowStaysOnTopHint | Qt.FramelessWindowHint)
+        self.setAttribute(Qt.WA_TranslucentBackground)
+        self.setAttribute(Qt.WA_NoSystemBackground, True)
+        self.setGeometry(self.screenGeometry())
+        self.instruction = ""
+        self.showFullScreen()
+
+    def set_instruction(self, text):
+        self.instruction = text
+        self.update()
+
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.Antialiasing)
+        # Fully transparent background
+        painter.fillRect(self.rect(), QColor(0, 0, 0, 0))
+        if self.instruction:
+            painter.setPen(QColor(255,255,255))
+            painter.setFont(QFont('Arial', 32, QFont.Bold))
+            painter.drawText(self.rect(), Qt.AlignTop | Qt.AlignHCenter, self.instruction)
+
+    def screenGeometry(self):
+        from PyQt5.QtGui import QGuiApplication
+        screens = QGuiApplication.screens()
+        if not screens:
+            return QApplication.primaryScreen().geometry()
+        rect = screens[0].geometry()
+        for screen in screens[1:]:
+            rect = rect.united(screen.geometry())
+        return rect
+
+def prompt_user_overlay_f3(message, overlay):
+    overlay.set_instruction(message + "\n(Press F3 to confirm)")
+    overlay.show()
+    confirmed = {'pressed': False}
+    def on_f3():
+        confirmed['pressed'] = True
+        overlay.set_instruction("")
+    keyboard.add_hotkey('f3', on_f3)
+    app = QApplication.instance()
+    while not confirmed['pressed']:
+        app.processEvents()
+        time.sleep(0.05)
 
 def prompt_user(message):
     print(f"{message} Press 'p' to confirm...")
@@ -22,13 +77,22 @@ def calibrate_crop_plots():
         data = json.load(f)
     plots = data.get("crop_plot_look_positions", [])
 
+
     # Prepare bot state and input
     bot_state = BotState()
     player_input = PlayerInput()
-    time.sleep(4)  # Give user time to switch to Game
+
+
+    app = QApplication(sys.argv)
+    overlay = CalibrationOverlay()
+    overlay.set_instruction("")
+    overlay.show()
+
+    # Initial prompt for user to stand on teleporter
+    prompt_user_overlay_f3("Stand on teleporter and press F3 to start", overlay)
 
     # Teleport to plots1
-    print("Teleporting to plots1 teleporter...")
+    prompt_user_overlay_f3("Teleporting to plots1 teleporter... Press F3 to continue.", overlay)
     player_input.teleport_to("plots1", bot_state)
     time.sleep(1)
 
@@ -41,7 +105,8 @@ def calibrate_crop_plots():
             if plot.get("target_name") == target_name:
                 crouch = plot.get("crouch", False)
                 break
-        prompt_user(f"Look at {target_name} and press 'p' after running ccc.")
+        overlay.set_instruction("")
+        prompt_user_overlay_f3(f"Look at {target_name} and press F3 after running ccc.", overlay)
         # Run ccc command and extract yaw/pitch
         pyautogui.press('tab')
         pyautogui.typewrite('ccc')
@@ -59,6 +124,10 @@ def calibrate_crop_plots():
             "crouch": crouch
         })
         print(f"{target_name}: yaw={yaw}, pitch={pitch}, crouch={crouch}")
+
+
+    overlay.close()
+    app.quit()
 
     # Save updated config
     data["crop_plot_look_positions"] = new_plots
